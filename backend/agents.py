@@ -51,7 +51,11 @@ async def analyze_niche_node(state: AgentState):
         ("user", "User's Website URL: {url}\n\nWebsite Content:\n{text}")
     ])
     
-    result = await structured_llm.ainvoke({"url": state["url"], "text": state["my_site_text"]})
+    chain = prompt | structured_llm
+    
+    # Text length limit to avoid token limits for very large pages
+    text_content = state["my_site_text"][:20000]
+    result = await chain.ainvoke({"url": state["url"], "text": text_content})
     
     logs = state.get("logs", [])
     logs.append(f"Analyzed niche. Summary: {result.niche_summary}")
@@ -95,6 +99,7 @@ async def scrape_competitors_node(state: AgentState):
         ("system", "Extract the store name and summarize the product offerings and pricing from the competitor's website content."),
         ("user", "URL: {url}\n\nContent:\n{text}")
     ])
+    chain = prompt | structured_llm
     
     competitors_data = []
     
@@ -106,7 +111,7 @@ async def scrape_competitors_node(state: AgentState):
         if text:
             logs.append(f"Successfully scraped {url}. Analyzing content...")
             try:
-                res = await structured_llm.ainvoke({"url": url, "text": text})
+                res = await chain.ainvoke({"url": url, "text": text})
                 competitors_data.append({
                     "url": url,
                     "name": res.name,
@@ -138,10 +143,11 @@ async def generate_recommendations_node(state: AgentState):
         """)
     ])
     
+    chain = prompt | structured_llm
     comps_str = "\n".join([f"Name: {c['name']}\nURL: {c['url']}\nInfo: {c['pricing_info']}\n" for c in state["competitors_data"]])
     
     try:
-        result = await structured_llm.ainvoke({
+        result = await chain.ainvoke({
             "niche": state["niche_summary"],
             "competitors": comps_str
         })
