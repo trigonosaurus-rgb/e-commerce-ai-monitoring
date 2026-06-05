@@ -73,7 +73,14 @@ npm install
 ### Start the Backend API
 Open a terminal in the root folder:
 ```bash
+# For Command Prompt (cmd.exe):
 backend\venv\Scripts\activate
+
+# For PowerShell (if you get an Execution Policy error):
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+backend\venv\Scripts\Activate.ps1
+
+# Run the API
 uvicorn backend.main:app --reload --port 8000
 ```
 
