@@ -1,39 +1,34 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
-from datetime import datetime
 import datetime as dt
 
-class ProductBase(SQLModel):
-    name: str = Field(index=True)
-    description: Optional[str] = None
-    my_price: float
-    url: Optional[str] = None
+class ResearchTaskBase(SQLModel):
+    url: str = Field(index=True)
+    niche: Optional[str] = None
+    search_query: Optional[str] = None
+    status: str = Field(default="pending") # pending, analyzing, searching, scraping, completed
+    timestamp: dt.datetime = Field(default_factory=dt.datetime.utcnow)
 
-class Product(ProductBase, table=True):
+class ResearchTask(ResearchTaskBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    competitor_prices: List["CompetitorPrice"] = Relationship(back_populates="product")
-    recommendations: List["Recommendation"] = Relationship(back_populates="product")
+    competitors: List["Competitor"] = Relationship(back_populates="task")
+    recommendations: List["FinalRecommendation"] = Relationship(back_populates="task")
 
-class CompetitorPriceBase(SQLModel):
-    competitor_name: str
-    price: float
-    discount_price: Optional[float] = None
-    in_stock: bool = True
+class CompetitorBase(SQLModel):
+    name: str
     url: str
-    timestamp: datetime = Field(default_factory=dt.datetime.utcnow)
+    extracted_pricing_info: str
 
-class CompetitorPrice(CompetitorPriceBase, table=True):
+class Competitor(CompetitorBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    product_id: int = Field(foreign_key="product.id")
-    product: Product = Relationship(back_populates="competitor_prices")
+    task_id: int = Field(foreign_key="researchtask.id")
+    task: ResearchTask = Relationship(back_populates="competitors")
 
-class RecommendationBase(SQLModel):
-    action: str = Field(description="Action to take: 'raise', 'lower', or 'keep'")
-    suggested_price: float
-    reason: str
-    timestamp: datetime = Field(default_factory=dt.datetime.utcnow)
+class FinalRecommendationBase(SQLModel):
+    strategy: str
+    actionable_steps: str
 
-class Recommendation(RecommendationBase, table=True):
+class FinalRecommendation(FinalRecommendationBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    product_id: int = Field(foreign_key="product.id")
-    product: Product = Relationship(back_populates="recommendations")
+    task_id: int = Field(foreign_key="researchtask.id")
+    task: ResearchTask = Relationship(back_populates="recommendations")

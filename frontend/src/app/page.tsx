@@ -1,181 +1,222 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer
-} from "recharts";
-import { AlertCircle, ArrowDownCircle, ArrowUpCircle, CheckCircle } from "lucide-react";
+import { Terminal, Globe, Search, ShoppingBag, Lightbulb, Play } from "lucide-react";
 
-interface CompetitorPrice {
+interface LogEntry {
+  text: string;
+  time: string;
+}
+
+interface Competitor {
   id: number;
-  competitor_name: string;
-  price: number;
-  discount_price?: number;
-  in_stock: boolean;
-  timestamp: string;
+  name: string;
+  url: string;
+  extracted_pricing_info: string;
 }
 
 interface Recommendation {
-  action: "raise" | "lower" | "keep";
-  suggested_price: number;
-  reason: string;
-  timestamp: string;
+  id: number;
+  strategy: string;
+  actionable_steps: string;
 }
 
-interface Product {
-  id: number;
-  name: string;
-  my_price: number;
-  url: string;
-  competitor_prices: CompetitorPrice[];
-  latest_recommendation?: Recommendation;
+interface TaskResult {
+  task: any;
+  competitors: Competitor[];
+  recommendations: Recommendation;
 }
 
 export default function Home() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchProducts = async () => {
-    try {
-      const res = await axios.get("http://localhost:8000/products");
-      setProducts(res.data);
-    } catch (error) {
-      console.error("Failed to fetch products:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const triggerScan = async (productId: number) => {
-    try {
-      await axios.post(`http://localhost:8000/trigger_scan/${productId}`);
-      alert("Scan triggered! It will run in the background. Refresh in a few seconds.");
-    } catch (error) {
-      console.error("Failed to trigger scan:", error);
-      alert("Failed to trigger scan.");
-    }
-  };
+  const [url, setUrl] = useState("");
+  const [taskId, setTaskId] = useState<number | null>(null);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [result, setResult] = useState<TaskResult | null>(null);
+  const logsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    // Auto-scroll logs
+    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [logs]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-black">
-        <p className="text-xl">Loading dashboard...</p>
-      </div>
-    );
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!url) return;
+
+    setLogs([]);
+    setResult(null);
+    setIsProcessing(true);
+
+    try {
+      // 1. Create task
+      const res = await axios.post("http://localhost:8000/tasks", { url });
+      const newTaskId = res.data.id;
+      setTaskId(newTaskId);
+
+      // 2. Connect to SSE
+      const eventSource = new EventSource(`http://localhost:8000/stream_task/${newTaskId}`);
+      
+      eventSource.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.log) {
+          setLogs((prev) => [...prev, { text: data.log, time: new Date().toLocaleTimeString() }]);
+        }
+        
+        if (data.status === "completed" || data.status === "failed") {
+          eventSource.close();
+          setIsProcessing(false);
+          if (data.status === "completed") {
+            fetchFinalResult(newTaskId);
+          }
+        }
+      };
+
+      eventSource.onerror = () => {
+        eventSource.close();
+        setIsProcessing(false);
+        setLogs((prev) => [...prev, { text: "Connection error.", time: new Date().toLocaleTimeString() }]);
+      };
+
+    } catch (error) {
+      console.error(error);
+      setIsProcessing(false);
+      alert("Failed to start research.");
+    }
+  };
+
+  const fetchFinalResult = async (id: number) => {
+    try {
+      const res = await axios.get(`http://localhost:8000/tasks/${id}`);
+      setResult(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 text-black">
-      <div className="max-w-6xl mx-auto">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">E-Commerce AI Monitoring</h1>
-          <p className="text-gray-600 mt-2">
-            Track competitors, analyze prices with LangGraph agents, and maximize profit.
+    <div className="min-h-screen bg-slate-50 text-slate-900 p-8 font-sans">
+      <div className="max-w-6xl mx-auto space-y-8">
+        
+        <header className="text-center space-y-4">
+          <div className="inline-flex items-center justify-center p-3 bg-blue-600 rounded-full mb-2">
+            <Globe className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">
+            Autonomous E-Commerce AI Researcher
+          </h1>
+          <p className="text-lg text-slate-500 max-w-2xl mx-auto">
+            Give us your store URL. Our AI will analyze your niche, hunt down your competitors, bypass their bot protection, scrape their prices, and formulate a winning strategy for you.
           </p>
         </header>
 
-        <div className="space-y-8">
-          {products.map((product) => {
-            // Prepare data for Recharts
-            const chartData = [...product.competitor_prices]
-              .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-              .map((cp) => ({
-                time: new Date(cp.timestamp).toLocaleTimeString(),
-                [cp.competitor_name]: cp.price,
-                "My Price": product.my_price,
-              }));
+        {/* Input Form */}
+        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <div className="flex space-x-4">
+            <input
+              type="url"
+              placeholder="https://your-store.com"
+              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              required
+              disabled={isProcessing}
+            />
+            <button
+              type="submit"
+              disabled={isProcessing}
+              className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-8 py-3 rounded-xl font-semibold flex items-center space-x-2 transition-colors"
+            >
+              {isProcessing ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Researching...</span>
+                </>
+              ) : (
+                <>
+                  <Play className="w-5 h-5 fill-current" />
+                  <span>Start AI Agent</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
 
-            const rec = product.latest_recommendation;
-
-            return (
-              <div key={product.id} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <h2 className="text-xl font-bold">{product.name}</h2>
-                    <p className="text-gray-500">My Price: ${product.my_price.toFixed(2)}</p>
-                    <a href={product.url} target="_blank" rel="noreferrer" className="text-blue-500 text-sm hover:underline">
-                      View Competitor Page
-                    </a>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          {/* Terminal / Live Logs */}
+          <div className="bg-slate-900 rounded-2xl shadow-xl overflow-hidden flex flex-col h-[600px]">
+            <div className="bg-slate-800 px-4 py-3 flex items-center space-x-2 border-b border-slate-700">
+              <Terminal className="w-4 h-4 text-slate-400" />
+              <span className="text-sm font-medium text-slate-300">Agent Thoughts Terminal</span>
+              <div className="flex-1" />
+              {isProcessing && <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />}
+            </div>
+            <div className="p-4 flex-1 overflow-y-auto font-mono text-sm space-y-3">
+              {logs.length === 0 ? (
+                <p className="text-slate-600 italic">Awaiting instructions...</p>
+              ) : (
+                logs.map((log, i) => (
+                  <div key={i} className="flex space-x-3">
+                    <span className="text-slate-500 shrink-0">[{log.time}]</span>
+                    <span className="text-green-400">{log.text}</span>
                   </div>
-                  <button
-                    onClick={() => triggerScan(product.id)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                  >
-                    Run AI Analysis
-                  </button>
-                </div>
+                ))
+              )}
+              <div ref={logsEndRef} />
+            </div>
+          </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Chart Section */}
-                  <div className="lg:col-span-2 h-72">
-                    {chartData.length > 0 ? (
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={chartData}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                          <XAxis dataKey="time" />
-                          <YAxis />
-                          <Tooltip />
-                          <Legend />
-                          <Line type="monotone" dataKey="My Price" stroke="#10b981" strokeWidth={2} />
-                          {Array.from(new Set(product.competitor_prices.map((p) => p.competitor_name))).map((comp, idx) => (
-                            <Line
-                              key={comp}
-                              type="monotone"
-                              dataKey={comp}
-                              stroke={['#ef4444', '#f59e0b', '#3b82f6'][idx % 3]}
-                              strokeWidth={2}
-                            />
-                          ))}
-                        </LineChart>
-                      </ResponsiveContainer>
-                    ) : (
-                      <div className="h-full flex items-center justify-center border-2 border-dashed border-gray-200 rounded-lg">
-                        <p className="text-gray-400">No competitor data yet. Run an analysis!</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Recommendation Section */}
-                  <div className="bg-gray-50 rounded-lg p-5 border border-gray-200 flex flex-col justify-center">
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
-                      AI Recommendation
-                    </h3>
-                    {rec ? (
-                      <div>
-                        <div className="flex items-center space-x-2 mb-3">
-                          {rec.action === "raise" && <ArrowUpCircle className="text-green-500 w-8 h-8" />}
-                          {rec.action === "lower" && <ArrowDownCircle className="text-red-500 w-8 h-8" />}
-                          {rec.action === "keep" && <CheckCircle className="text-blue-500 w-8 h-8" />}
-                          <span className="text-xl font-bold capitalize">{rec.action} Price</span>
-                        </div>
-                        <p className="text-3xl font-black mb-2">${rec.suggested_price.toFixed(2)}</p>
-                        <p className="text-sm text-gray-600 italic bg-white p-3 rounded shadow-sm border border-gray-100">
-                          "{rec.reason}"
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="text-center text-gray-400">
-                        <AlertCircle className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                        <p>No recommendations yet.</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+          {/* Results Area */}
+          <div className="h-[600px] overflow-y-auto space-y-6">
+            {!result ? (
+              <div className="h-full flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl">
+                <Search className="w-12 h-12 mb-4 opacity-50" />
+                <p>Final report will appear here once research completes.</p>
               </div>
-            );
-          })}
+            ) : (
+              <>
+                {/* Competitors List */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <div className="flex items-center space-x-2 mb-6">
+                    <ShoppingBag className="w-6 h-6 text-blue-600" />
+                    <h2 className="text-xl font-bold">Identified Competitors</h2>
+                  </div>
+                  <div className="space-y-4">
+                    {result.competitors.length === 0 ? (
+                      <p className="text-slate-500 italic">No competitors found.</p>
+                    ) : (
+                      result.competitors.map((comp) => (
+                        <div key={comp.id} className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                          <a href={comp.url} target="_blank" rel="noreferrer" className="text-lg font-bold text-blue-600 hover:underline">
+                            {comp.name}
+                          </a>
+                          <p className="text-sm text-slate-600 mt-2">{comp.extracted_pricing_info}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* AI Recommendation */}
+                {result.recommendations && (
+                  <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-2xl shadow-lg text-white">
+                    <div className="flex items-center space-x-2 mb-6">
+                      <Lightbulb className="w-6 h-6 text-yellow-300" />
+                      <h2 className="text-xl font-bold">AI Strategy & Actions</h2>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                        <p className="whitespace-pre-wrap">{result.recommendations.actionable_steps}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
         </div>
       </div>
     </div>
