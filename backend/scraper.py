@@ -1,12 +1,13 @@
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
-from playwright_stealth import stealth_async
+from playwright_stealth import stealth
 
 async def scrape_site(url: str) -> str:
     """
     Scrapes a website using Playwright with stealth settings to bypass simple bot protection.
     Returns the visible text of the page.
     """
+    browser = None
     try:
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
@@ -15,7 +16,7 @@ async def scrape_site(url: str) -> str:
                 viewport={"width": 1920, "height": 1080}
             )
             page = await context.new_page()
-            await stealth_async(page)
+            await stealth(page)
             
             # Navigate to the URL
             await page.goto(url, wait_until="domcontentloaded", timeout=15000)
@@ -24,7 +25,6 @@ async def scrape_site(url: str) -> str:
             await page.wait_for_timeout(2000)
             
             html_content = await page.content()
-            await browser.close()
             
             soup = BeautifulSoup(html_content, 'html.parser')
             
@@ -40,3 +40,6 @@ async def scrape_site(url: str) -> str:
     except Exception as e:
         print(f"Error scraping {url}: {e}")
         return ""
+    finally:
+        if browser:
+            await browser.close()
