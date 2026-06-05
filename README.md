@@ -59,6 +59,7 @@ pip install -r backend/requirements.txt
 Create a `.env` file in the root directory:
 ```env
 OPENAI_API_KEY=your_openai_api_key_here
+TAVILY_API_KEY=your_tavily_api_key_here
 SLACK_WEBHOOK_URL=your_slack_webhook_url_here (optional)
 ```
 

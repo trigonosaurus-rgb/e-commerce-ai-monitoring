@@ -40,7 +40,10 @@ async def run_research_background(task_id: int, url: str):
     
     def log(msg: str):
         task_logs_store[task_id].append(msg)
-        print(f"[Task {task_id}] {msg}")
+        try:
+            print(f"[Task {task_id}] {msg}".encode('utf-8', 'ignore').decode('utf-8'))
+        except Exception:
+            pass
 
     log(f"Starting research for {url}...")
     log("Scraping your website...")

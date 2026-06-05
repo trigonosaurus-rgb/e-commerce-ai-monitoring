@@ -10,5 +10,6 @@ python-dotenv
 slack_sdk
 playwright
 playwright-stealth
-duckduckgo-search
+langchain-community
+tavily-python
 sse-starlette

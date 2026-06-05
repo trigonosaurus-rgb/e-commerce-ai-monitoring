@@ -5,7 +5,7 @@ from langgraph.graph import StateGraph, START, END
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
-from duckduckgo_search import DDGS
+from langchain_community.tools.tavily_search import TavilySearchResults
 from backend.scraper import scrape_site
 
 # Ensure API key is loaded
@@ -70,19 +70,17 @@ async def analyze_niche_node(state: AgentState):
 async def search_competitors_node(state: AgentState):
     query = state["search_query"]
     logs = state.get("logs", [])
-    logs.append(f"Executing web search for: '{query}'")
+    logs.append(f"Executing Tavily web search for: '{query}'")
     
-    # Run duckduckgo search
-    # We use an executor because DDGS is sync
     try:
-        ddgs = DDGS()
-        results = ddgs.text(query, max_results=3)
-        competitor_urls = [r["href"] for r in results if r.get("href")]
+        tavily = TavilySearchResults(max_results=3)
+        results = await tavily.ainvoke({"query": query})
+        competitor_urls = [r["url"] for r in results if "url" in r]
     except Exception as e:
-        logs.append(f"Web search failed: {str(e)}")
+        logs.append(f"Tavily search failed (check API key): {str(e)}")
         competitor_urls = []
         
-    logs.append(f"Found {len(competitor_urls)} potential competitor URLs.")
+    logs.append(f"Found {len(competitor_urls)} potential competitor URLs via Tavily.")
     
     return {
         "competitor_urls": competitor_urls,
