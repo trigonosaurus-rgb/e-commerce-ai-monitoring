@@ -4,12 +4,15 @@
    loopback or link-local address (otherwise anyone could make our server read
    `http://localhost:...` or the cloud metadata endpoint — an SSRF attack).
    Every redirect hop is checked again.
-2. A plain HTTPS request (fast, free, keeps the raw HTML with its structured price data).
-   If the site refuses it, we ask once more as an openly named crawler: many shops
-   (e.g. Shopify stores behind Cloudflare) turn away a browser-like request that doesn't
-   come from a real browser, but welcome a bot that says what it is.
-3. If the site still refuses us (403/429/bot page), Tavily Extract fetches it from its
-   servers. We don't try to disguise ourselves or bypass bot protection.
+2. Direct requests (fast, free, keep the raw HTML with its structured price data), in
+   the order that opens the most shops:
+   a) as Chrome: the same headers and TLS handshake a real Chrome sends (curl_cffi), so
+      bot filters that look at the connection, not just the User-Agent, let it through;
+   b) as an openly named crawler: many Shopify stores behind Cloudflare welcome a bot
+      that says what it is;
+   c) as a plain HTTP client with a browser User-Agent (a few sites dislike a).
+3. If all of them are refused (403/429/bot page), Tavily Extract fetches the page from
+   its servers. No CAPTCHA solving, no proxy networks, and checks are rare (twice a day).
 """
 
 import asyncio
@@ -23,6 +26,9 @@ from urllib.parse import urljoin, urlsplit
 
 import httpx
 from bs4 import BeautifulSoup, UnicodeDammit
+from curl_cffi.requests import AsyncSession
+from curl_cffi.requests.exceptions import RequestException as CurlRequestError
+from curl_cffi.requests.exceptions import Timeout as CurlTimeout
 
 from backend import search
 from backend.config import get_settings
@@ -45,7 +51,8 @@ CRAWLER_HEADERS = HEADERS | {
 }
 _BLOCK_MARKERS = re.compile(
     r"captcha|access denied|are you a robot|verify you are human|just a moment|cf-chl|"
-    r"enable javascript and cookies",
+    r"enable javascript and cookies|powered and protected by|checking your browser|"
+    r"pardon our interruption|request unsuccessful|press (?:&|and) hold",
     re.IGNORECASE,
 )
 # Shops with several "markets" (built into Shopify) show visitors from abroad another
@@ -185,49 +192,87 @@ def _looks_blocked(status: int, text: str) -> bool:
     return len(text) < 1500 and bool(_BLOCK_MARKERS.search(text))
 
 
+def _check_content_type(headers) -> None:
+    kind = (headers.get("content-type") or "").lower().split(";")[0].strip()
+    if kind.startswith(FILE_TYPES):
+        raise PermanentFetchError(f"The link is not a web page ({kind}).")
+    if kind and "html" not in kind:
+        # e.g. text/plain "Access denied" from bot protection: worth another route
+        raise FetchError(f"the site answered with {kind} instead of a page")
+
+
+def _page(url: str, body: bytes, charset: str | None) -> Page:
+    html = UnicodeDammit(body, [charset] if charset else []).unicode_markup or ""
+    return Page(url=url, text=html_to_text(html), html=html, via="direct")
+
+
+def _next_hop(current: str, headers) -> str:
+    location = headers.get("location")
+    if not location:
+        raise FetchError("The site sent a broken redirect.")
+    return urljoin(current, location)
+
+
 async def _fetch_direct(
     url: str, client: httpx.AsyncClient, headers: dict[str, str]
 ) -> tuple[int, Page]:
-    settings = get_settings()
+    limit = get_settings().fetch_max_bytes
     current = url
     for _ in range(MAX_REDIRECTS + 1):
         await ensure_public_url(current)
         async with client.stream("GET", current, headers=headers) as response:
             if response.is_redirect:
-                location = response.headers.get("location")
-                if not location:
-                    raise FetchError("The site sent a broken redirect.")
-                current = urljoin(current, location)
+                current = _next_hop(current, response.headers)
                 continue
-            kind = response.headers.get("content-type", "").lower().split(";")[0].strip()
-            if kind.startswith(FILE_TYPES):
-                raise PermanentFetchError(f"The link is not a web page ({kind}).")
-            if kind and "html" not in kind:
-                # e.g. text/plain "Access denied" from bot protection: worth another route
-                raise FetchError(f"the site answered with {kind} instead of a page")
+            _check_content_type(response.headers)
             body = bytearray()
             async for chunk in response.aiter_bytes():
                 body += chunk
-                if len(body) >= settings.fetch_max_bytes:
+                if len(body) >= limit:
                     break
-            known = [response.charset_encoding] if response.charset_encoding else []
-            html = UnicodeDammit(bytes(body), known).unicode_markup or ""
-            page = Page(url=str(response.url), text=html_to_text(html), html=html, via="direct")
+            page = _page(str(response.url), bytes(body), response.charset_encoding)
             return response.status_code, page
     raise FetchError("The site redirects too many times.")
 
 
-async def _try_direct(url: str, client: httpx.AsyncClient, headers: dict) -> Page | str:
+async def _fetch_as_browser(url: str, extra_headers: dict[str, str]) -> tuple[int, Page]:
+    """Like `_fetch_direct`, but through curl_cffi with Chrome's TLS and HTTP/2 fingerprint."""
+    settings = get_settings()
+    current = url
+    async with AsyncSession(impersonate="chrome", timeout=settings.fetch_timeout_seconds) as s:
+        for _ in range(MAX_REDIRECTS + 1):
+            await ensure_public_url(current)  # every hop, as with httpx
+            async with s.stream(
+                "GET", current, headers=extra_headers, allow_redirects=False
+            ) as response:
+                if response.status_code in (301, 302, 303, 307, 308):
+                    current = _next_hop(current, response.headers)
+                    continue
+                _check_content_type(response.headers)
+                body = bytearray()
+                async for chunk in response.aiter_content():
+                    body += chunk
+                    if len(body) >= settings.fetch_max_bytes:
+                        break
+                page = _page(str(response.url), bytes(body), response.charset_encoding)
+                return response.status_code, page
+    raise FetchError("The site redirects too many times.")
+
+
+NO_ANSWER = ("the site did not", "connection")  # the site is down: other routes won't help
+
+
+async def _try_direct(url: str, attempt) -> Page | str:
     """The page, or the reason the site refused it (dead links and unsafe URLs raise)."""
     try:
-        status, page = await _fetch_direct(url, client, headers)
+        status, page = await attempt(url)
     except UnsafeURLError, PermanentFetchError:
         raise
     except FetchError as exc:
         return str(exc)
-    except httpx.TimeoutException:
+    except httpx.TimeoutException, CurlTimeout:
         return "the site did not respond in time"
-    except httpx.HTTPError as exc:
+    except (httpx.HTTPError, CurlRequestError) as exc:
         return f"connection error ({type(exc).__name__})"
     if status in (404, 410):
         raise PermanentFetchError(
@@ -258,15 +303,22 @@ async def fetch_page(
             client = await stack.enter_async_context(
                 httpx.AsyncClient(timeout=settings.fetch_timeout_seconds, follow_redirects=False)
             )
-        result = await _try_direct(url, client, HEADERS | cookie)
-        if isinstance(result, str) and not result.startswith(("the site did not", "connection")):
-            log.info("%s refused a browser-like request (%s), asking as a crawler", url, result)
-            second = await _try_direct(url, client, CRAWLER_HEADERS | cookie)
-            if isinstance(second, Page):
-                return second
-        if isinstance(result, Page):
-            return result
-    reason = result
+        attempts = [
+            ("as a crawler", lambda u: _fetch_direct(u, client, CRAWLER_HEADERS | cookie)),
+            ("as a plain client", lambda u: _fetch_direct(u, client, HEADERS | cookie)),
+        ]
+        if settings.browser_fingerprint:
+            language = {"Accept-Language": HEADERS["Accept-Language"]}
+            attempts.insert(0, ("as Chrome", lambda u: _fetch_as_browser(u, language | cookie)))
+        reason = None
+        for label, attempt in attempts:
+            result = await _try_direct(url, attempt)
+            if isinstance(result, Page):
+                return result
+            log.info("%s refused a request %s: %s", url, label, result)
+            reason = reason or result  # the first refusal is the most telling one
+            if result.startswith(NO_ANSWER):
+                break
     if settings.search_configured:
         log.info("Direct fetch of %s failed (%s), trying Tavily Extract", url, reason)
         if page := await fetch_via_tavily(url):

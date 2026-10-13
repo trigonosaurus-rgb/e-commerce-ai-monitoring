@@ -45,6 +45,7 @@ class Settings(BaseSettings):
     max_products_per_user: int = 25
     max_offers_per_product: int = 6
     fetch_timeout_seconds: float = 15
+    browser_fingerprint: bool = True  # first request with Chrome's TLS fingerprint
     fetch_max_bytes: int = 3_000_000
 
     # --- Access --------------------------------------------------------------------

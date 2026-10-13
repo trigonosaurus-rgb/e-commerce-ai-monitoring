@@ -18,6 +18,7 @@ os.environ.update(
         "TAVILY_API_KEY": "",
         "TELEGRAM_BOT_TOKEN": "",
         "SMTP_HOST": "",
+        "BROWSER_FINGERPRINT": "false",  # no real network: tests use httpx fakes
     }
 )
 

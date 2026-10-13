@@ -67,10 +67,16 @@ refurbished and other-market offers (other country or currency) are rejected wit
 schema.org `Product`/`Offer` JSON-LD — exact and free. Pages without it go to the LLM, which must
 quote the page text it read the price from; the quote is checked against the page. Pages are
 requested the way a local customer sees them: multi-country shops (Shopify "markets") get a
-country hint, otherwise a UK shop shows a visitor from Germany its price without VAT. If a store
-refuses the request, Rivalscope asks once more as an openly named crawler (`RivalscopeBot`) —
-many Shopify stores welcome that — and only then pays for Tavily Extract. It never disguises
-itself or bypasses bot protection: a blocked page is shown as blocked.
+country hint, otherwise a UK shop shows a visitor from Germany its price without VAT.
+
+**Getting through bot filters.** Many shops refuse anything that doesn't look like a browser, so
+each page is requested in up to four ways, stopping at the first that works: as Chrome (the
+same headers and TLS handshake a real Chrome sends, via `curl_cffi`), as an openly named crawler
+(`RivalscopeBot`, which many Shopify stores prefer), as a plain HTTP client, and finally through
+Tavily Extract, which fetches the page from its own servers. On 83 real product pages this
+raised the number read with a price from 49 to 62, before Tavily. Rivalscope doesn't solve
+CAPTCHAs or rent proxy networks, and it reads each page only twice a day; pages that stay
+refused are shown as blocked.
 
 **Not trusting a single reading.** A price that moves more than 60% in one check, or changes
 currency, is stored as evidence but flagged for review instead of triggering an alert.
@@ -192,7 +198,7 @@ container per database: the scheduler lives inside the process.
 
 ## Quality
 
-- 66 tests run offline (`uv run pytest`): price extraction on real-world page shapes, SSRF
+- 67 tests run offline (`uv run pytest`): price extraction on real-world page shapes, SSRF
   protection, monitoring rules, the agent graph with a fake web/LLM, the API, demo read-only mode.
 - `ruff` for the backend, ESLint + TypeScript for the frontend, migrations checked against the
   models, Docker build — all in [CI](.github/workflows/ci.yml).
@@ -207,7 +213,7 @@ backend/
   monitor.py           price checks, sanity rules, alerts
   scheduler.py         background loop driven by Offer.next_check_at
   extraction.py        JSON-LD / microdata / meta parsing + verified LLM fallback
-  fetching.py          safe page fetching (SSRF guard, Tavily fallback)
+  fetching.py          safe page fetching (SSRF guard, browser fingerprint, Tavily fallback)
   llm.py               every OpenAI call, as typed Pydantic outputs
   events.py            the run journal shown in the UI
   notify/              Telegram and email delivery
@@ -221,8 +227,10 @@ frontend/src/
 
 ## Limitations
 
-- Sites with aggressive bot protection or JavaScript-only prices (e.g. Amazon, John Lewis,
-  Currys, Sephora) are often unreadable and shown as blocked or "no price found".
+- Sites with the strongest bot protection or JavaScript-only prices (e.g. Home Depot, x-kom,
+  Sephora, John Lewis) often stay unreadable and are shown as blocked or "no price found".
+- Shops' terms of use and robots.txt are not checked; whoever runs the service decides which
+  stores to track.
 - Product variants (size, color) are matched carefully, but the final word is the user's approval.
 - Prices are compared only within one currency; other markets are out of scope by design.
 - Price history in the demo is real and grows with time — it started in October 2026.

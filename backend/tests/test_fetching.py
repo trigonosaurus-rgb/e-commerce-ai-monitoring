@@ -112,19 +112,27 @@ async def test_plain_text_answer_is_treated_as_a_block_not_a_dead_link():
     assert not isinstance(info.value, PermanentFetchError)
 
 
-async def test_refused_browser_request_is_retried_as_named_crawler():
-    agents = []
+async def test_each_route_is_tried_until_one_opens_the_page(monkeypatch):
+    """Chrome fingerprint → named crawler → plain client: the first page that opens wins."""
+    monkeypatch.setattr(fetching.get_settings(), "browser_fingerprint", True)
+    tried = []
+
+    async def refused_as_chrome(url, headers):
+        tried.append("chrome")
+        return 429, fetching.Page(url=url, text="Too many requests", html="", via="direct")
 
     def handler(request):
-        agents.append(request.headers["user-agent"])
-        if "RivalscopeBot" not in request.headers["user-agent"]:
-            return httpx.Response(429, html="<html><body>Too many requests</body></html>")
+        agent = request.headers["user-agent"]
+        tried.append("crawler" if "RivalscopeBot" in agent else "plain")
+        if "RivalscopeBot" in agent:
+            return httpx.Response(403, html="<html><body>Forbidden</body></html>")
         return httpx.Response(200, html="<html><body><main>" + "Linen towel. " * 40 + "</main>")
 
+    monkeypatch.setattr(fetching, "_fetch_as_browser", refused_as_chrome)
     async with _client(handler) as client:
         page = await fetch_page(f"{PUBLIC}/products/towel", client=client)
+    assert tried == ["chrome", "crawler", "plain"]
     assert page.via == "direct" and "Linen towel" in page.text
-    assert len(agents) == 2 and "RivalscopeBot" in agents[1]
 
 
 async def test_product_link_landing_on_home_page_counts_as_removed():
@@ -165,3 +173,9 @@ async def test_shop_is_asked_for_its_local_price():
     async with _client(handler) as client:
         await fetch_page(f"{PUBLIC}/products/tin", client=client, market="united kingdom")
     assert cookies == ["localization=GB"]
+
+
+def test_bot_challenge_pages_are_recognised():
+    assert fetching._looks_blocked(200, "Powered and protected by | Privacy")
+    assert fetching._looks_blocked(200, "Pardon Our Interruption... As you were browsing")
+    assert not fetching._looks_blocked(200, "Oak lamp. " * 300)
