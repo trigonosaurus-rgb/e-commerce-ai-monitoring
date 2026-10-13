@@ -1,6 +1,7 @@
 """Sign in/out, notification settings, access requests, public metadata and health."""
 
 import secrets
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Request, Response
 from sqlalchemy import text
@@ -108,7 +109,8 @@ async def test_notification(user: CurrentUser):
     app = get_settings().app_name
     results = await notify.send_to_user(
         user,
-        f"Test alert from {app}",
+        # a unique subject, so mail apps don't fold repeated tests into one conversation
+        f"Test alert from {app} · {datetime.now(UTC):%H:%M:%S} UTC",
         "If you can read this, price alerts will reach you here.",
         [{"label": f"Open {app}", "url": notify.app_link("/")}],
     )
