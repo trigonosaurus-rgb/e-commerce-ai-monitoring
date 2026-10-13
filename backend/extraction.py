@@ -46,13 +46,19 @@ class ProductData:
     method: str | None = None  # jsonld | microdata | meta | llm
     evidence: str = ""
     note: str | None = None  # why the price is missing, if it is
+    # the page's <title>: often names the variant (colour, size, gender) that the
+    # structured data leaves out, e.g. "HOKA Clifton 10 Men's Shoes Raw Linen/Stone"
+    page_title: str | None = None
 
     @property
     def has_price(self) -> bool:
         return self.price is not None and self.price > 0 and bool(self.currency)
 
     def identity(self) -> dict[str, str | None]:
-        return {"name": self.name, "brand": self.brand, "mpn": self.mpn, "gtin": self.gtin}
+        identity = {"name": self.name, "brand": self.brand, "mpn": self.mpn, "gtin": self.gtin}
+        if self.page_title and self.page_title != self.name:
+            identity["page_title"] = self.page_title
+        return identity
 
 
 # ---------------------------------------------------------------------------- helpers
@@ -303,6 +309,8 @@ def extract_structured(html: str, page_url: str) -> ProductData:
             data.brand = data.brand or fallback.brand
     data.name = data.name or _meta(soup, "og:title")
     data.image = data.image or _meta(soup, "og:image")
+    title = soup.title.get_text(" ", strip=True) if soup.title else _meta(soup, "og:title")
+    data.page_title = re.sub(r"\s+", " ", title)[:200] if title else None
     return data
 
 

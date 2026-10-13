@@ -1,0 +1,15 @@
+{
+ "https://shop.harmonsgrocery.com/store/harmons/products/169296-lodge-cast-iron-10-25-cast-iron-skillet-1-ea": {"correct": true, "note": "Lodge 10.25in skillet = L8SK3"},
+ "https://www.costco.com/p/-/hoka-mens-clifton-10-shoe/4000377854": {"correct": true, "note": "men's Clifton 10, page offers several colourways"},
+ "https://www.fleetfeet.com/products/mens-hoka-clifton-10": {"correct": true, "note": "men's Clifton 10, page offers several colourways"},
+ "https://www.familyfootwearcenter.com/hoka-1162030-clifton-10-running-shoes-oatmeal-oat-milk": {"correct": false, "note": "Oatmeal/Oat Milk colourway; ours is Raw Linen/Stone"},
+ "https://www.costco.com/p/-/fellow-stagg-ekg-electric-kettle/4000397413": {"correct": true, "note": "original Stagg EKG, single kettle"},
+ "https://fellowproducts.com/products/stagg-ekg-electric-pour-over-kettle": {"correct": false, "note": "page sells the EKG Pro / Pro Studio at $199.95"},
+ "https://formandfunctioncoffee.com/shop/fellow-stagg-ekg-electric-kettle/": {"correct": true, "note": "original Stagg EKG"},
+ "https://noelgrimleys.com/p-24018-ninja-af100uk-3-8l-air-fryer-and-dehydrator-grey.aspx": {"correct": true},
+ "https://www.very.co.uk/ninja-4-in-1-38-litre-single-basketnbspair-fryer-af100uk/1600348148.prd": {"correct": true},
+ "https://www.helenround.com/products/winter-fox-collection-linen-tea-towel": {"correct": true, "note": "the maker's own shop"},
+ "https://www.auchan.fr/seb-autocuiseur-clipsominut-gourmande-7-5l/pr-296ef128-ec5d-4f2d-9411-b55483301a80": {"correct": true},
+ "https://www.showroomprive.com/market/catalog/productp.aspx?produit=m-10691928": {"correct": true},
+ "https://theordinary.com/fr-fr/niacinamide-10-zinc-1-serum-100436.html": {"correct": true, "note": "brand's own French shop, 30 ml"}
+}

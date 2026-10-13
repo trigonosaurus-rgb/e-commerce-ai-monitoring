@@ -1,0 +1,830 @@
+[
+ {
+  "id": "us-lodge-skillet",
+  "market": "US",
+  "niche": "Kitchen, branded, UPC on the page",
+  "url": "https://www.abt.com/Lodge-10.25-Cast-Iron-Skillet-L8SK3/p/81755.html",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Lodge 10.25\" Cast Iron Skillet - L8SK3",
+   "brand": "Lodge",
+   "gtin": "0075536300801",
+   "mpn": "L8SK3",
+   "market": "united states",
+   "price": 24.9,
+   "currency": "USD"
+  },
+  "queries": [
+   "Lodge L8SK3 10.25 cast iron skillet",
+   "0075536300801",
+   "Lodge L8SK3 skillet buy"
+  ],
+  "retailers": [
+   "amazon.com",
+   "walmart.com",
+   "target.com",
+   "kohls.com",
+   "macys.com",
+   "wayfair.com",
+   "sur la table.com",
+   "crateandbarrel.com",
+   "acehardware.com",
+   "lowes.com"
+  ],
+  "attempts": 1,
+  "screened": 21,
+  "screen_kept": 5,
+  "verify_rejected": [
+   {
+    "store": "homedepot.com",
+    "url": "https://www.homedepot.com/p/Lodge-10-25-in-Cast-Iron-Skillet-in-Black-with-Pour-Spout-L8SK3/301036400",
+    "reason": "Couldn't load the page: HTTP 403; the backup reader (Tavily) was blocked too."
+   },
+   {
+    "store": "katom.com",
+    "url": "https://www.katom.com/261-L8SK3.html",
+    "reason": "This doesn't look like a single product page."
+   },
+   {
+    "store": "wasserstrom.com",
+    "url": "http://www.wasserstrom.com/restaurant-supplies-equipment/lodge%C2%AE-manufacturing-l8sk3-10-1-4-cast-iron-skillet-177371",
+    "reason": "This doesn't look like a single product page."
+   }
+  ],
+  "proposals": [
+   {
+    "store": "rainsofojai.com",
+    "url": "https://rainsofojai.com/10-25-cast-iron-skillet-l8sk3-lodge",
+    "title": "10.25 in Cast Iron Skillet",
+    "price": 46.0,
+    "currency": "USD",
+    "confidence": 0.99,
+    "reason": "Same EAN/GTIN code on both pages.",
+    "score": "correct"
+   },
+   {
+    "store": "shop.harmonsgrocery.com",
+    "url": "https://shop.harmonsgrocery.com/store/harmons/products/169296-lodge-cast-iron-10-25-cast-iron-skillet-1-ea",
+    "title": "Lodge Cast Iron 10.25\" Cast Iron Skillet",
+    "price": 39.99,
+    "currency": "USD",
+    "confidence": 0.92,
+    "reason": "Both listings identify a Lodge 10.25-inch cast iron skillet, and no conflicting variant details are shown.",
+    "score": "correct"
+   }
+  ],
+  "correct": 2,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 9,
+  "tavily_cached_calls": 0,
+  "llm_cost_usd": 0.002,
+  "seconds": 38
+ },
+ {
+  "id": "us-hoka-clifton",
+  "market": "US",
+  "niche": "Running shoes: sizes and colourways, no codes on the page",
+  "url": "https://www.runningwarehouse.com/HOKA_Clifton_10/descpage-H10CM15.html",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "HOKA Clifton 10",
+   "brand": "HOKA",
+   "gtin": null,
+   "mpn": null,
+   "market": "united states",
+   "price": 104.88,
+   "currency": "USD"
+  },
+  "queries": [
+   "HOKA Clifton 10 running shoes",
+   "HOKA Clifton 10 men's shoes",
+   "HOKA Clifton 10",
+   "HOKA Clifton 10 men's running shoe buy",
+   "HOKA Clifton 10 road running shoe size color",
+   "HOKA Clifton 10 1162030"
+  ],
+  "retailers": [
+   "roadrunnersports.com",
+   "fleetfeet.com",
+   "rei.com",
+   "zappos.com",
+   "dickssportinggoods.com",
+   "nordstrom.com",
+   "shoe palace.com",
+   "holabirdsports.com",
+   "athleticannex.com",
+   "thewalkingcompany.com",
+   "asics.com",
+   "backcountry.com",
+   "paragon sports.com",
+   "shoemall.com",
+   "als.com"
+  ],
+  "attempts": 2,
+  "screened": 21,
+  "screen_kept": 10,
+  "verify_rejected": [
+   {
+    "store": "hoka.com",
+    "url": "https://www.hoka.com/en/us/mens-everyday-running-gear/clifton-10/1162030.html",
+    "reason": "Couldn't load the page: HTTP 403; the backup reader (Tavily) was blocked too."
+   },
+   {
+    "store": "footlocker.com",
+    "url": "https://www.footlocker.com/product/model/hoka-clifton-10-mens/440858.html",
+    "reason": "Page not found (HTTP 404) — the product may have been removed."
+   },
+   {
+    "store": "dickssportinggoods.com",
+    "url": "https://www.dickssportinggoods.com/p/hoka-womens-clifton-10-running-shoes-25fhqwclftn10blckftw/25fhqwclftn10blckftw",
+    "reason": "Couldn't load the page: HTTP 451; the backup reader (Tavily) was blocked too."
+   },
+   {
+    "store": "dickssportinggoods.com",
+    "url": "https://www.dickssportinggoods.com/p/hoka-mens-clifton-10-running-shoes-24fhqmclftn10blckmns/24fhqmclftn10blckmns",
+    "reason": "Couldn't load the page: HTTP 451; the backup reader (Tavily) was blocked too."
+   },
+   {
+    "store": "jdsports.com",
+    "url": "https://www.jdsports.com/pdp/mens-hoka-clifton-10-running-shoes/prod2874647/1162030/003",
+    "reason": "This doesn't look like a single product page."
+   },
+   {
+    "store": "rei.com",
+    "url": "https://www.rei.com/product/242759/hoka-clifton-10-road-running-shoes-womens",
+    "reason": "Couldn't load the page: HTTP 403; the backup reader (Tavily) was blocked too."
+   }
+  ],
+  "proposals": [
+   {
+    "store": "costco.com",
+    "url": "https://www.costco.com/p/-/hoka-mens-clifton-10-shoe/4000377854",
+    "title": "Hoka Men's Clifton 10 Shoe",
+    "price": 114.99,
+    "currency": "USD",
+    "confidence": 0.97,
+    "reason": "Both listings identify the HOKA Clifton 10, with no conflicting variant details.",
+    "score": "correct"
+   },
+   {
+    "store": "fleetfeet.com",
+    "url": "https://www.fleetfeet.com/products/mens-hoka-clifton-10",
+    "title": "Men's | HOKA Clifton 10",
+    "price": 116.25,
+    "currency": "USD",
+    "confidence": 0.97,
+    "reason": "Both listings are for the HOKA Clifton 10, and the men's designation does not conflict with any variant specified for your product.",
+    "score": "correct"
+   },
+   {
+    "store": "familyfootwearcenter.com",
+    "url": "https://www.familyfootwearcenter.com/hoka-1162030-clifton-10-running-shoes-oatmeal-oat-milk",
+    "title": "Hoka 1162030 CLIFTON 10 Running Shoes Oatmeal Oat Milk",
+    "price": 124.0,
+    "currency": "USD",
+    "confidence": 0.95,
+    "reason": "Both listings are HOKA Clifton 10 running shoes; the oatmeal/oat milk color is an unspecified variant of the product.",
+    "score": "wrong"
+   }
+  ],
+  "correct": 2,
+  "wrong": 1,
+  "unlabeled": 0,
+  "tavily_credits": 10,
+  "tavily_cached_calls": 0,
+  "llm_cost_usd": 0.0017,
+  "seconds": 89
+ },
+ {
+  "id": "us-fellow-kettle",
+  "market": "US",
+  "niche": "Specialty coffee shop (Shopify), shop name in the brand field",
+  "url": "https://us.lacabra.com/products/fellow-stagg-ekg-2",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Fellow Stagg EKG",
+   "brand": null,
+   "gtin": null,
+   "mpn": null,
+   "market": "united states",
+   "price": 165.0,
+   "currency": "USD"
+  },
+  "queries": [
+   "Fellow Stagg EKG electric kettle",
+   "Fellow Stagg EKG pour-over kettle for sale"
+  ],
+  "retailers": [
+   "williams-sonoma.com",
+   "crateandbarrel.com",
+   "sur latable.com",
+   "seattlecoffeegear.com",
+   "prima-coffee.com",
+   "clivecoffee.com",
+   "wholelattelove.com"
+  ],
+  "attempts": 1,
+  "screened": 11,
+  "screen_kept": 3,
+  "verify_rejected": [],
+  "proposals": [
+   {
+    "store": "costco.com",
+    "url": "https://www.costco.com/p/-/fellow-stagg-ekg-electric-kettle/4000397413",
+    "title": "Fellow Stagg EKG Electric Kettle",
+    "price": 129.99,
+    "currency": "USD",
+    "confidence": 0.98,
+    "reason": "Both listings identify the Fellow Stagg EKG electric kettle, with no conflicting variant details.",
+    "score": "correct"
+   },
+   {
+    "store": "fellowproducts.com",
+    "url": "https://fellowproducts.com/products/stagg-ekg-electric-pour-over-kettle",
+    "title": "Stagg EKG Electric Kettle",
+    "price": 199.95,
+    "currency": "USD",
+    "confidence": 0.96,
+    "reason": "Both listings identify the Fellow Stagg EKG electric kettle, with no conflicting variant details.",
+    "score": "wrong"
+   },
+   {
+    "store": "formandfunctioncoffee.com",
+    "url": "https://formandfunctioncoffee.com/shop/fellow-stagg-ekg-electric-kettle/",
+    "title": "Fellow Stagg EKG Electric Kettle – Form & Function",
+    "price": 169.95,
+    "currency": "USD",
+    "confidence": 0.96,
+    "reason": "Both listings identify the Fellow Stagg EKG electric kettle, with no conflicting model or variant details.",
+    "score": "correct"
+   }
+  ],
+  "correct": 2,
+  "wrong": 1,
+  "unlabeled": 0,
+  "tavily_credits": 2,
+  "tavily_cached_calls": 0,
+  "llm_cost_usd": 0.0008,
+  "seconds": 27
+ },
+ {
+  "id": "uk-ninja-airfryer",
+  "market": "UK",
+  "niche": "Small appliance, shop SKU instead of the maker's model code",
+  "url": "https://www.euronics.co.uk/catalogue/small-appliances/small-cooking-appliances/air-fryers/ninja-af100uk-38l-air-fryer-and-dehydrator-grey/p/NINAF100UK",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Ninja AF100UK 3.8L Air Fryer and Dehydrator - Grey",
+   "brand": "Ninja",
+   "gtin": null,
+   "mpn": "NINAF100UK",
+   "market": "united kingdom",
+   "price": 99.0,
+   "currency": "GBP"
+  },
+  "queries": [
+   "Ninja AF100UK 3.8L Air Fryer and Dehydrator Grey",
+   "Ninja AF100UK air fryer"
+  ],
+  "retailers": [
+   "currys.co.uk",
+   "argos.co.uk",
+   "johnlewis.com",
+   "ao.com",
+   "very.co.uk",
+   "robertdyas.co.uk",
+   "lakeland.co.uk",
+   "dunelm.com"
+  ],
+  "attempts": 1,
+  "screened": 20,
+  "screen_kept": 6,
+  "verify_rejected": [
+   {
+    "store": "johnlewis.com",
+    "url": "https://www.johnlewis.com/ninja-af100uk-air-fryer-grey/p4846470",
+    "reason": "No price found on the page."
+   },
+   {
+    "store": "business.currys.co.uk",
+    "url": "https://business.currys.co.uk/catalogue/domestic-appliances/small-kitchen-appliances/air-fryers/ninja-af100uk-air-fryer-black/N500438W",
+    "reason": "No price found on the page."
+   },
+   {
+    "store": "robertdyas.co.uk",
+    "url": "https://www.robertdyas.co.uk/ninja-af100uk-3-8l-air-fryer-45-grey",
+    "reason": "No price found on the page."
+   }
+  ],
+  "proposals": [
+   {
+    "store": "noelgrimleys.com",
+    "url": "https://noelgrimleys.com/p-24018-ninja-af100uk-3-8l-air-fryer-and-dehydrator-grey.aspx",
+    "title": "Ninja AF100UK 3.8L Air Fryer and Dehydrator - Grey",
+    "price": 99.99,
+    "currency": "GBP",
+    "confidence": 0.98,
+    "reason": "The model, 3.8L capacity, product type, and grey color match; the MPNs refer to the same AF100UK model.",
+    "score": "correct"
+   },
+   {
+    "store": "very.co.uk",
+    "url": "https://www.very.co.uk/ninja-4-in-1-38-litre-single-basketnbspair-fryer-af100uk/1600348148.prd",
+    "title": "NINJA 4-in-1 3.8 Litre Single Basket Air Fryer AF100UK",
+    "price": 109.0,
+    "currency": "GBP",
+    "confidence": 0.98,
+    "reason": "Both listings identify the Ninja AF100UK with a 3.8 L capacity; the title wording differs but indicates the same model and variant.",
+    "score": "correct"
+   }
+  ],
+  "correct": 2,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 11,
+  "tavily_cached_calls": 0,
+  "llm_cost_usd": 0.0034,
+  "seconds": 40
+ },
+ {
+  "id": "uk-helen-round-towel",
+  "market": "UK",
+  "niche": "Small designer brand without EAN, sold by gift shops",
+  "url": "https://countrylivingshop.co.uk/products/winter-fox-linen-tea-towel",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Winter Fox Linen Tea Towel",
+   "brand": "Helen Round",
+   "gtin": null,
+   "mpn": null,
+   "market": "united kingdom",
+   "price": 18.0,
+   "currency": "GBP"
+  },
+  "queries": [
+   "Helen Round Winter Fox Linen Tea Towel",
+   "Helen Round fox linen tea towel UK",
+   "\"Winter Fox\" \"Helen Round\" tea towel",
+   "Helen Round Winter Fox tea towel stockist UK",
+   "Helen Round Winter Fox tea towel linen shop",
+   "\"Winter Fox\" Helen Round tea towel buy"
+  ],
+  "retailers": [
+   "thebasketcompany.com",
+   "contemporaryhome.com",
+   "nationaltrust.org.uk",
+   "shop.britishmuseum.org",
+   "shop.rhs.org.uk",
+   "designmuseumshop.com",
+   "amara.com",
+   "johnlewis.com",
+   "utilitydesign.co.uk",
+   "thefuturekept.com",
+   "theconranshop.com",
+   "heals.com",
+   "roseandgrey.co.uk",
+   "designist.ie",
+   "lifestyle.co.uk",
+   "fenwick.co.uk"
+  ],
+  "attempts": 2,
+  "screened": 11,
+  "screen_kept": 2,
+  "verify_rejected": [
+   {
+    "store": "helenround.com",
+    "url": "https://www.helenround.com/products/linen-tea-towels",
+    "reason": "The listing describes generic linen tea towels and does not identify the specific Winter Fox design."
+   }
+  ],
+  "proposals": [
+   {
+    "store": "helenround.com",
+    "url": "https://www.helenround.com/products/winter-fox-collection-linen-tea-towel",
+    "title": "Winter Fox Linen Tea Towel",
+    "price": 18.0,
+    "currency": "GBP",
+    "confidence": 0.98,
+    "reason": "The listing has the same product name, and no conflicting variant details are shown.",
+    "score": "correct"
+   }
+  ],
+  "correct": 1,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 8,
+  "tavily_cached_calls": 0,
+  "llm_cost_usd": 0.001,
+  "seconds": 47
+ },
+ {
+  "id": "uk-lakeland-tin",
+  "market": "UK",
+  "niche": "Shop's own brand (negative control)",
+  "url": "https://www.lakeland.co.uk/products/lakeland-brownie-traybake-tin",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Lakeland Brownie Traybake Tin",
+   "brand": "Lakeland",
+   "gtin": null,
+   "mpn": null,
+   "market": "united kingdom",
+   "price": 9.99,
+   "currency": "GBP"
+  },
+  "queries": [
+   "Lakeland Brownie Traybake Tin",
+   "Lakeland brownie traybake tin buy UK",
+   "Lakeland brownie tin traybake",
+   "Lakeland brownie traybake tin 20 x 20 cm UK",
+   "Lakeland brownie baking tin traybake pan buy UK",
+   "Lakeland square brownie tin Lakeland baking tin"
+  ],
+  "retailers": [
+   "robertdyas.co.uk",
+   "johnlewis.com",
+   "dunelm.com",
+   "nisbets.co.uk",
+   "souschef.co.uk",
+   "wayfair.co.uk",
+   "very.co.uk",
+   "next.co.uk",
+   "thecookskitchen.com",
+   "kitchenwareonline.com",
+   "harts of stur.com"
+  ],
+  "attempts": 2,
+  "screened": 18,
+  "screen_kept": 1,
+  "verify_rejected": [
+   {
+    "store": "amazon.co.uk",
+    "url": "https://www.amazon.co.uk/Lakeland-Traybake-Brownie-Portion-Guidelines/dp/B00VAAJSDY",
+    "reason": "Sells in EUR, outside your market (GBP)."
+   }
+  ],
+  "proposals": [],
+  "correct": 0,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 7,
+  "tavily_cached_calls": 0,
+  "llm_cost_usd": 0.0015,
+  "seconds": 50
+ },
+ {
+  "id": "fr-seb-pressure-cooker",
+  "market": "France",
+  "niche": "Cookware, EAN, French-language shop",
+  "url": "https://www.boulanger.com/ref/1230647",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Autocuiseur SEB ClipsoMinut Gourmande 7.5L",
+   "brand": "SEB",
+   "gtin": "3045380402034",
+   "mpn": null,
+   "market": "france",
+   "price": 126.1,
+   "currency": "EUR"
+  },
+  "queries": [
+   "SEB ClipsoMinut Gourmande 7,5 L autocuiseur",
+   "3045380402034",
+   "autocuiseur SEB ClipsoMinut Gourmande 7.5L"
+  ],
+  "retailers": [
+   "darty.com",
+   "fnac.com",
+   "carrefour.fr",
+   "auchan.fr",
+   "ubaldi.com",
+   "conforama.fr",
+   "electrodepot.fr"
+  ],
+  "attempts": 1,
+  "screened": 21,
+  "screen_kept": 7,
+  "verify_rejected": [
+   {
+    "store": "but.fr",
+    "url": "https://www.but.fr/produits/3045380402034/Cocotte-Minute-7-5l-Acier-Inoxydable-P4624877.html",
+    "reason": "Couldn't load the page: HTTP 403; the backup reader (Tavily) was blocked too."
+   },
+   {
+    "store": "brico-travo.com",
+    "url": "https://brico-travo.com/hammel/460156-clipso-minutgourmande-7l5---gpe-seb-france-menage-3045380402034.html",
+    "reason": "Page not found (HTTP 404) — the product may have been removed."
+   },
+   {
+    "store": "carrefour.fr",
+    "url": "https://www.carrefour.fr/p/cocotte-minute-7-5l-acier-inoxydable-seb-p4624877-3045380402034",
+    "reason": "The AI-read price could not be verified against the page text."
+   }
+  ],
+  "proposals": [
+   {
+    "store": "e.leclerc",
+    "url": "https://www.e.leclerc/fp/cocotte-minute-7-5l-acier-inoxydable-p4624877-seb-3045380402034",
+    "title": "Cocotte minute 7.5l acier inoxydable  - P4624877 - Seb",
+    "price": 110.0,
+    "currency": "EUR",
+    "confidence": 0.99,
+    "reason": "Same EAN/GTIN code on both pages.",
+    "score": "correct"
+   },
+   {
+    "store": "fnac.com",
+    "url": "https://www.fnac.com/SEB-Cocotte-minute-7-5L-ClipsoMinut-Gourmande-P4624877/a22046556/w-4",
+    "title": "SEB Cocotte-minute 7,5L ClipsoMinut'' Gourmande P4624877",
+    "price": 110.0,
+    "currency": "EUR",
+    "confidence": 0.99,
+    "reason": "Same EAN/GTIN code on both pages.",
+    "score": "correct"
+   },
+   {
+    "store": "auchan.fr",
+    "url": "https://www.auchan.fr/seb-autocuiseur-clipsominut-gourmande-7-5l/pr-296ef128-ec5d-4f2d-9411-b55483301a80",
+    "title": "Autocuiseur ClipsoMinut Gourmande 7.5L",
+    "price": 126.1,
+    "currency": "EUR",
+    "confidence": 0.98,
+    "reason": "Both listings identify the SEB ClipsoMinut Gourmande 7.5L autocooker, with no differing variant details.",
+    "score": "correct"
+   },
+   {
+    "store": "showroomprive.com",
+    "url": "https://www.showroomprive.com/market/catalog/productp.aspx?produit=m-10691928",
+    "title": "Autocuiseur SEB ClipsoMinut Gourmande 7.5L",
+    "price": 117.51,
+    "currency": "EUR",
+    "confidence": 0.87,
+    "reason": "Both listings identify the SEB ClipsoMinut Gourmande 7.5L autocooker.",
+    "score": "correct"
+   }
+  ],
+  "correct": 4,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 6,
+  "tavily_cached_calls": 0,
+  "llm_cost_usd": 0.0019,
+  "seconds": 43
+ },
+ {
+  "id": "fr-ordinary-serum",
+  "market": "France",
+  "niche": "Cosmetics in an online pharmacy, EAN",
+  "url": "https://www.redcare-pharmacie.fr/beaute/BE04657888/the-ordinary-niacinamide-10-zinc-1.htm",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "THE ORDINARY Niacinamide 10% + Zinc 1%",
+   "brand": "The Ordinary.",
+   "gtin": "0769915195941",
+   "mpn": "BE003370",
+   "market": "france",
+   "price": 5.69,
+   "currency": "EUR"
+  },
+  "queries": [
+   "The Ordinary Niacinamide 10% + Zinc 1% 30 ml",
+   "769915195941",
+   "The Ordinary Niacinamide 10% Zinc 1% acheter France",
+   "0769915195941",
+   "The Ordinary Niacinamide 10% Zinc 1% 60 ml France",
+   "The Ordinary sérum niacinamide zinc grand format 60 ml acheter",
+   "The Ordinary Niacinamide 10% + Zinc 1% 60 ml 769915195941"
+  ],
+  "retailers": [
+   "sephora.fr",
+   "notino.fr",
+   "nocibe.fr",
+   "easypara.fr",
+   "cocooncenter.com",
+   "lookfantastic.fr",
+   "pharmacieeurope.com",
+   "marionnaud.fr",
+   "carrefour.fr",
+   "auchan.fr",
+   "monoprix.fr",
+   "galerieslafayette.com",
+   "pharmacie-monaco.com",
+   "pharmacie-prado-mermoz.com",
+   "pharmacie-des-drakkars.com",
+   "pharma-gdd.com",
+   "parapharmacie-en-ligne.com",
+   "greenweez.com"
+  ],
+  "attempts": 2,
+  "screened": 53,
+  "screen_kept": 5,
+  "verify_rejected": [
+   {
+    "store": "sephora.fr",
+    "url": "https://www.sephora.fr/p/niacinamide-10%25-zinc-1%25---serum-anti-imperfections-P3921091.html",
+    "reason": "Couldn't load the page: HTTP 403; the backup reader (Tavily) was blocked too."
+   },
+   {
+    "store": "notino.fr",
+    "url": "https://www.notino.fr/the-ordinary/niacinamide-10-zinc-1-high-strength-vitamin-and-mineral-blemish-formula-serum-leger-visage-anti-imperfections-de-la-peau",
+    "reason": "Different EAN/GTIN (769915195958 vs 0769915195941)."
+   },
+   {
+    "store": "galerieslafayette.com",
+    "url": "https://www.galerieslafayette.com/p/solutions-niacinamide+10+zinc+1-the+ordinary/57010853/378",
+    "reason": "This doesn't look like a single product page."
+   }
+  ],
+  "proposals": [
+   {
+    "store": "marionnaud.fr",
+    "url": "https://www.marionnaud.fr/soin-visage/purifiant-et-matifiant/anti-imperfections-niacinamide-10-zinc-1-the-ordinary/p/BP_102671260",
+    "title": "THE ORDINARY ANTI-IMPERFECTIONS Niacinamide 10% + zinc 1%",
+    "price": 6.0,
+    "currency": "EUR",
+    "confidence": 0.99,
+    "reason": "Same EAN/GTIN code on both pages.",
+    "score": "correct"
+   },
+   {
+    "store": "theordinary.com",
+    "url": "https://theordinary.com/fr-fr/niacinamide-10-zinc-1-serum-100436.html",
+    "title": "Niacinamide 10% + Zinc 1%",
+    "price": 6.0,
+    "currency": "EUR",
+    "confidence": 0.94,
+    "reason": "The product name matches The Ordinary Niacinamide 10% + Zinc 1%; the listing’s MPN indicates the EU 30 ml variant, with no conflicting variant details.",
+    "score": "correct"
+   }
+  ],
+  "correct": 2,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 13,
+  "tavily_cached_calls": 0,
+  "llm_cost_usd": 0.0025,
+  "seconds": 61
+ },
+ {
+  "id": "nl-philips-airfryer",
+  "market": "Netherlands",
+  "niche": "Appliance, no EAN in the page data, possibly discontinued",
+  "url": "https://www.coolblue.nl/en/product/878234/philips-airfryer-l-hd9252-70.html",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Philips Airfryer L HD9252/70",
+   "brand": "Philips",
+   "gtin": null,
+   "mpn": null,
+   "market": "netherlands",
+   "price": 99.0,
+   "currency": "EUR"
+  },
+  "queries": [
+   "Philips Airfryer L HD9252/70 kopen",
+   "Philips HD9252/70 airfryer",
+   "Philips HD9252/70",
+   "Philips HD9252/70 Airfryer L bestellen",
+   "Philips HD9252/70 heteluchtfriteuse",
+   "Philips HD9252/70 friteuse aanbieding"
+  ],
+  "retailers": [
+   "bol.com",
+   "mediamarkt.nl",
+   "wehkamp.nl",
+   "expert.nl",
+   "blokker.nl",
+   "fonq.nl",
+   "artandcraft.com",
+   "vandenborre.be",
+   "electroworld.nl",
+   "handyman.nl",
+   "maxict.nl",
+   "alternate.nl",
+   "kookwinkel.nl",
+   "keukenloods.nl",
+   "ep.nl",
+   "bemmel-kroon.nl",
+   "hellotv.nl"
+  ],
+  "attempts": 2,
+  "screened": 39,
+  "screen_kept": 1,
+  "verify_rejected": [
+   {
+    "store": "joybuy.nl",
+    "url": "https://www.joybuy.nl/dp/philips-airfryer-essential-3000-series-hd925270/10084968",
+    "reason": "This doesn't look like a single product page."
+   }
+  ],
+  "proposals": [],
+  "correct": 0,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 8,
+  "tavily_cached_calls": 0,
+  "llm_cost_usd": 0.0017,
+  "seconds": 58
+ },
+ {
+  "id": "pl-logitech-mouse",
+  "market": "Poland",
+  "niche": "Electronics, EAN, currency PLN",
+  "url": "https://mediamarkt.pl/pl/product/_mysz-logitech-mx-master-3s-bluetooth-edition-grafitowy-1497571.html",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Mysz LOGITECH MX Master 3S \"SE\" Bluetooth Edition Grafitowy",
+   "brand": "LOGITECH",
+   "gtin": "5099206129382",
+   "mpn": null,
+   "market": "poland",
+   "price": 319.99,
+   "currency": "PLN"
+  },
+  "queries": [
+   "Logitech MX Master 3S SE Bluetooth Edition grafitowy",
+   "5099206129382",
+   "Logitech MX Master 3S Bluetooth Edition grafitowy cena"
+  ],
+  "retailers": [
+   "x-kom.pl",
+   "morele.net",
+   "euro.com.pl",
+   "komputronik.pl",
+   "oleole.pl",
+   "mediaexpert.pl",
+   "proshop.pl",
+   "al.to"
+  ],
+  "attempts": 1,
+  "screened": 28,
+  "screen_kept": 7,
+  "verify_rejected": [
+   {
+    "store": "mediaexpert.pl",
+    "url": "https://www.mediaexpert.pl/komputery-i-tablety/myszy-komputerowe/myszki-uniwersalne/mysz-logitech-mx-master-3s-se-grafitowy",
+    "reason": "This doesn't look like a single product page."
+   },
+   {
+    "store": "euro.com.pl",
+    "url": "https://www.euro.com.pl/myszy/logitech-mysz-mx-master-3s-se-graphite.bhtml",
+    "reason": "No price found on the page."
+   },
+   {
+    "store": "oleole.pl",
+    "url": "https://www.oleole.pl/myszy-komputerowe/logitech-mysz-mx-master-3s-se-graphite.bhtml",
+    "reason": "This doesn't look like a single product page."
+   },
+   {
+    "store": "x-kom.pl",
+    "url": "https://www.x-kom.pl/p/1365777-myszka-bezprzewodowa-logitech-mx-master-3s-edition-bluetooth.html",
+    "reason": "Couldn't load the page: HTTP 403; the backup reader (Tavily) was blocked too."
+   },
+   {
+    "store": "al.to",
+    "url": "https://www.al.to/p/1365777-myszka-bezprzewodowa-logitech-mx-master-3s-edition-bluetooth.html",
+    "reason": "No price found on the page."
+   }
+  ],
+  "proposals": [
+   {
+    "store": "morele.net",
+    "url": "https://www.morele.net/mysz-logitech-mx-master-3s-bluetooth-edition-graphite-910-007501-15520069/",
+    "title": "Mysz Logitech MX Master 3S Bluetooth Edition Graphite (910-007501)",
+    "price": 319.0,
+    "currency": "PLN",
+    "confidence": 0.99,
+    "reason": "Same EAN/GTIN code on both pages.",
+    "score": "correct"
+   },
+   {
+    "store": "komputronik.pl",
+    "url": "https://www.komputronik.pl/product/984087/myszka-logitech-mx-master-3s-se-grafitowy.html",
+    "title": "Myszka Logitech MX Master 3s SE bezprzewodowa szara",
+    "price": 340.0,
+    "currency": "PLN",
+    "confidence": 0.99,
+    "reason": "Same EAN/GTIN code on both pages.",
+    "score": "correct"
+   }
+  ],
+  "correct": 2,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 12,
+  "tavily_cached_calls": 0,
+  "llm_cost_usd": 0.0028,
+  "seconds": 48
+ }
+]

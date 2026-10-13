@@ -184,3 +184,9 @@ async def test_discovery_fails_clearly_on_a_non_product_page(fake_world, monkeyp
         run_row = session.get(Run, run.run_id)
     assert run_row.status == "failed"
     assert "single product page" in run_row.error
+
+
+def test_retailer_domains_from_the_model_are_cleaned():
+    assert discovery.clean_domain("sur la table.com") == "surlatable.com"
+    assert discovery.clean_domain("https://www.Argos.co.uk/") == "argos.co.uk"
+    assert discovery.clean_domain("not a domain") is None

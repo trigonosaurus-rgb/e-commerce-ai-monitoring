@@ -59,8 +59,8 @@ async def search_web(
     }
     try:
         response = await client.search(query, country=country, **params)
-    except BadRequestError:
-        if not country:
+    except BadRequestError as exc:
+        if not country or "country" not in str(exc).lower():
             raise
         # Tavily only accepts its own list of country names; search globally instead.
         log.warning("Tavily rejected country=%r, retrying without it", country)

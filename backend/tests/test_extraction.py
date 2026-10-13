@@ -127,3 +127,14 @@ def test_shop_name_in_brand_field_is_not_the_maker():
     assert not shop_named_as_brand("Fellow", "Fellow Stagg EKG", "https://us.lacabra.com/p/ekg")
     # a brand's own shop that repeats the brand in the product name is fine
     assert not shop_named_as_brand("DeLonghi", "DeLonghi Dedica", "https://www.delonghi.com/p")
+
+
+def test_page_title_keeps_the_variant_for_matching():
+    html = (
+        "<html><head><title>HOKA Clifton 10 Men's Shoes Raw Linen/Stone</title>"
+        '<script type="application/ld+json">{"@type": "Product", "name": "HOKA Clifton 10", '
+        '"offers": {"price": "104.88", "priceCurrency": "USD"}}</script></head></html>'
+    )
+    identity = extract_structured(html, "https://shoes.example.com/p").identity()
+    assert identity["name"] == "HOKA Clifton 10"
+    assert "Raw Linen/Stone" in identity["page_title"]

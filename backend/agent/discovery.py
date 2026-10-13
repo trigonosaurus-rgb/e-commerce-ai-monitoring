@@ -17,6 +17,7 @@ Every step writes to the run journal, so the UI shows what was found, kept and r
 
 import asyncio
 import logging
+import re
 from dataclasses import dataclass
 from datetime import timedelta
 from typing import TypedDict
@@ -80,6 +81,14 @@ def _room_left(product_id: int) -> int:
             )
         ).all()
     return max(get_settings().max_offers_per_product - len(taken), 0)
+
+
+def clean_domain(raw: str) -> str | None:
+    """The model sometimes writes "sur la table.com"; one bad domain makes the whole
+    retailer search fail, so spaces are dropped and anything still invalid is skipped."""
+    text = re.sub(r"\s+", "", raw.lower()).removeprefix("https://").removeprefix("http://")
+    domain = search.domain_of("https://" + text)
+    return domain if re.fullmatch(r"[a-z0-9-]+(\.[a-z0-9-]+)+", domain) else None
 
 
 # ------------------------------------------------------------------------------ nodes
@@ -230,10 +239,7 @@ async def plan_queries(state: DiscoveryState, runtime: Runtime[DiscoveryContext]
     if gtin and gtin not in state["tried_queries"]:
         queries.append(gtin)
     queries = [q for q in dict.fromkeys(queries) if q not in state["tried_queries"]][:4]
-    retailers = [
-        search.domain_of("https://" + d.strip().removeprefix("https://").removeprefix("http://"))
-        for d in plan.retailer_domains
-    ]
+    retailers = [clean_domain(d) for d in plan.retailer_domains]
     skip = set(tried_retailers) | set(state["excluded_domains"])
     retailers = [d for d in dict.fromkeys(retailers) if d and d not in skip][:10]
     market = state.get("market") or plan.market_country
@@ -382,7 +388,9 @@ async def verify(state: DiscoveryState, runtime: Runtime[DiscoveryContext]) -> d
         else:
             try:
                 match = await llm.compare_products(
-                    product, data.identity() | {"page_title": c["title"]}, usage=run
+                    product,
+                    {"page_title": c["title"]} | data.identity(),  # their own <title> wins
+                    usage=run,
                 )
             except llm.LLMError as exc:
                 return c, None, str(exc)

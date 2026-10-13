@@ -142,6 +142,7 @@ async def run_case(case: dict, user_id: int, meter: TavilyMeter, labels: dict) -
         if e.step == "verify" and e.level == "warning" and e.data
     ]
     plans = [e.data for e in events if e.step == "plan_queries" and e.data]
+    search_errors = [e.message for e in events if e.step == "search" and e.level == "warning"]
     proposals = [
         {
             "store": o.domain,
@@ -178,6 +179,7 @@ async def run_case(case: dict, user_id: int, meter: TavilyMeter, labels: dict) -
         "queries": [q for p in plans for q in p.get("queries", [])],
         "retailers": [r for p in plans for r in p.get("retailers", [])],
         "attempts": len(plans),
+        "search_errors": search_errors,
         "screened": len(screened),
         "screen_kept": sum(1 for d in screened if d.get("kept")),
         "verify_rejected": rejected,
@@ -245,6 +247,7 @@ def markdown(results: list[dict], account_delta: int | None) -> str:
             f"- Retailers guessed: {', '.join(r['retailers']) or '—'}",
             f"- Screened {r['screened']} pages, kept {r['screen_kept']}",
         ]
+        lines += [f"- search error: {m[:160]}" for m in r.get("search_errors", [])]
         for o in r["proposals"]:
             mark = {"correct": "✓", "wrong": "✗", "unlabeled": "?"}[o["score"]]
             lines.append(
