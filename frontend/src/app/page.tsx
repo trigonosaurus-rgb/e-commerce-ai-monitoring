@@ -36,7 +36,7 @@ function ProductRow({ product }: { product: ProductSummary }) {
   return (
     <Link
       href={`/product/?id=${product.id}`}
-      className="group grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 px-4 py-3.5 transition-colors hover:bg-muted/50 md:grid-cols-[minmax(0,2.2fr)_1fr_1fr_auto_auto_auto]"
+      className="group grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 px-4 py-3.5 transition-colors hover:bg-muted/50 md:grid-cols-[minmax(0,2fr)_1fr_1fr_150px_16px] lg:grid-cols-[minmax(0,2.2fr)_1fr_1fr_80px_150px_16px]"
     >
       <div className="flex min-w-0 items-center gap-3">
         <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-white">
@@ -80,7 +80,9 @@ function ProductRow({ product }: { product: ProductSummary }) {
       <div className="hidden lg:block" title="Cheapest competitor, last 14 days">
         <Sparkline values={product.trend.map((t) => t.lowest)} />
       </div>
-      <PositionBadge position={p} />
+      <div className="justify-self-end">
+        <PositionBadge position={p} />
+      </div>
       <ChevronRight className="hidden size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 md:block" />
     </Link>
   );

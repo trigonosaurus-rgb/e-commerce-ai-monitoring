@@ -213,7 +213,7 @@ function EventDetails({ event }: { event: RunEvent }) {
 
 function Feed({ events, live }: { events: RunEvent[]; live: boolean }) {
   return (
-    <ol className="relative grid gap-4 before:absolute before:top-2 before:bottom-2 before:left-[9px] before:w-px before:bg-border">
+    <ol className="relative grid grid-cols-1 gap-4 before:absolute before:top-2 before:bottom-2 before:left-[9px] before:w-px before:bg-border">
       {events.map((event) => {
         const { icon: Icon, className } = LEVEL_ICON[event.level];
         return (
