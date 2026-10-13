@@ -57,3 +57,6 @@ frontend/out/
 
 # discovery eval: throw-away DB and cached search answers
 evals/.cache/
+
+# personal helpers kept out of the repository
+local/

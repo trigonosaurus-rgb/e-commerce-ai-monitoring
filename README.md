@@ -171,10 +171,6 @@ uv run python -m backend.cli export-demo you@example.com demo.json
 uv run python -m backend.cli seed-demo demo.json    # load a workspace into the public demo
 ```
 
-Price checks run inside the server. To collect history without keeping it running, schedule
-`uv run python -m backend.cli check-due` (cron, or `scripts/schedule-checks.ps1` on Windows):
-it runs the checks that are due and exits.
-
 ### Docker
 
 ```bash

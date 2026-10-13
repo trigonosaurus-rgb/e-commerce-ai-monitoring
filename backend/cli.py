@@ -137,8 +137,7 @@ def list_access_requests() -> None:
 
 
 def check_due() -> None:
-    """Runs the price checks that are due, then exits. Lets a cron job or Windows Task
-    Scheduler collect price history without keeping the web server running."""
+    """Runs the price checks that are due, then exits (for running checks from cron)."""
     from backend.scheduler import scheduler
 
     log_dir = ROOT_DIR / "data" / "logs"
