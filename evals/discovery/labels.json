@@ -111,5 +111,30 @@
  },
  "https://www.mobiletvservices.co.uk/ninja-af100uk-grey-20251.html": {
   "correct": true
+ },
+ "https://www.thewashhouse.com/ninja/ninja-af100uk-grey-200112629": {
+  "correct": true
+ },
+ "https://panasonicstore-inverness.com/ninja-af100uk-50009826.html": {
+  "correct": true
+ },
+ "https://www.sainsburys.co.uk/groceries/product/ninja-38l-air-fryer-and-dehydrator-%E2%80%93-af100uk": {
+  "correct": true
+ },
+ "https://www.notino.fr/the-ordinary/niacinamide-10-zinc-1-high-strength-vitamin-and-mineral-blemish-formula-serum-leger-visage-anti-imperfections-de-la-peau": {
+  "correct": false,
+  "note": "€10.80 and another EAN on an earlier read: the 60 ml bottle"
+ },
+ "https://www.my-origines.com/fr/niacinamide-10-zinc-1-89K57102.html?sds=0&sop=0&bvstate=pg%3A3%2Fct%3Ar": {
+  "correct": true,
+  "note": "French section of the shop, €6"
+ },
+ "https://www.marskramer.nl/philips-airfryer-essential-hd9252-70-212-9252/": {
+  "correct": true,
+  "note": "HD9252/70 is the Essential Airfryer L"
+ },
+ "https://re.now/products/philips-airfryer-essential-hd9252-70-1400w": {
+  "correct": false,
+  "note": "outlet for graded customer returns, not new"
  }
 }

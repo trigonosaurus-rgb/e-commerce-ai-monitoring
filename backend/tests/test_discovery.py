@@ -31,6 +31,7 @@ PAGES = {
     "https://good-two.de/sony-xm6": ProductData(name="WH-1000XM6"),
     "https://refurb.de/xm6": ProductData(name="Sony WH-1000XM6", condition="refurbished"),
     "https://uk-shop.co.uk/xm6": ProductData(name="Sony WH-1000XM6"),
+    "https://bundle.de/xm6": ProductData(name="Sony WH-1000XM6 + case"),
 }
 PRICES = {
     "https://good-one.de/xm6": 379.0,
@@ -38,6 +39,7 @@ PRICES = {
     "https://good-two.de/sony-xm6": 389.0,
     "https://refurb.de/xm6": 299.0,
     "https://uk-shop.co.uk/xm6": 349.0,
+    "https://bundle.de/xm6": 799.0,
 }
 CURRENCIES = {"https://uk-shop.co.uk/xm6": "GBP"}
 
@@ -91,6 +93,7 @@ def fake_world(monkeypatch):
             return [
                 result("https://niche-shop.de/kopfhoerer", "Kopfhörer kaufen"),
                 result("https://magazine.de/best-headphones", "Die besten Kopfhörer"),
+                result("https://shop.at/kopfhoerer", "Kopfhörer kaufen"),
             ]
         if include_domains:  # the retailer-restricted search
             calls["retailer_search"] = include_domains
@@ -107,6 +110,7 @@ def fake_world(monkeypatch):
                 result("https://blocked.de/xm6", "Sony WH-1000XM6"),
                 result("https://refurb.de/xm6", "Sony WH-1000XM6 refurbished"),
                 result("https://uk-shop.co.uk/xm6", "Sony WH-1000XM6"),
+                result("https://bundle.de/xm6", "Sony WH-1000XM6"),
             ]
         if query == "4548736160213":
             return []
@@ -134,7 +138,7 @@ def fake_world(monkeypatch):
             llm.StoreVerdict(
                 domain=s["domain"],
                 kind="media_or_review" if "magazine" in s["domain"] else "online_shop",
-                sells_this_kind=True,
+                could_sell_this_product=True,
                 reason="test",
             )
             for s in stores
@@ -195,10 +199,15 @@ async def test_discovery_retries_and_proposes_verified_offers(fake_world):
     assert any("attempt 2/2" in m for m in messages)
     assert any("refurb.de: rejected — Sells it refurbished" in m for m in messages)
     assert any("uk-shop.co.uk: rejected — Sells in GBP" in m for m in messages)
+    assert any(
+        "bundle.de: rejected — The name matches, but the price is +100%" in m for m in messages
+    )
     assert events[-1].step == "propose"
     research = next(e for e in events if e.step == "research")
     dropped = {s["domain"]: s["reason"] for s in research.data["stores"] if not s["kept"]}
-    assert set(dropped) == {"magazine.de", "made-up-shop.de"}
+    assert set(dropped) == {"magazine.de", "made-up-shop.de", "shop.at"}
+    assert "another country (AT)" in dropped["shop.at"]
+    assert "shop.at" not in fake_world["classified"]  # dropped before asking the model
     assert "does not exist" in dropped["made-up-shop.de"]
 
 

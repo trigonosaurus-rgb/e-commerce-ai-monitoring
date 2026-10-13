@@ -153,6 +153,20 @@ def market_country_code(url: str, market: str | None = None) -> str | None:
     return "GB" if tld == "uk" else tld.upper()
 
 
+def foreign_domain(domain: str, market: str | None) -> str | None:
+    """The country a domain clearly belongs to, if it is not the market's: by its country
+    TLD (shop.be for the Dutch market) or a country subdomain (us.brand.com for the UK)."""
+    home = COUNTRY_CODES.get((market or "").strip().lower())
+    if not home:
+        return None
+    labels = domain.lower().split(".")
+    codes = {market_country_code("https://" + domain)}
+    if len(labels) > 2 and len(labels[0]) == 2:
+        codes.add("GB" if labels[0] == "uk" else labels[0].upper())
+    known = set(COUNTRY_CODES.values())
+    return next((c for c in codes if c in known and c != home), None)
+
+
 def html_to_text(html: str) -> str:
     soup = BeautifulSoup(html, "html.parser")
     for tag in soup(["script", "style", "noscript", "svg", "iframe", "template"]):

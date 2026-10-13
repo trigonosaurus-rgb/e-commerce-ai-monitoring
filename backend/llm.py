@@ -182,7 +182,11 @@ class StoreVerdict(BaseModel):
         "other_market",
         "not_a_shop",
     ]
-    sells_this_kind: bool = Field(description="Sells this kind of product (not just related).")
+    could_sell_this_product: bool = Field(
+        description="True for a shop that sells this kind of product from several brands, or "
+        "the own shop of THIS product's brand. False for another brand's own shop: it will "
+        "never stock this product."
+    )
     reason: str = Field(description="A few words a store owner would understand.")
 
 
@@ -210,8 +214,8 @@ async def classify_stores(
         instructions="You map the online stores competing in a niche. For every domain say "
         "what it is: an online shop of this market, a brand's own shop, a marketplace with "
         "many sellers, a price-comparison site, a magazine/review/blog, a shop serving "
-        "another country, or not a shop. Then say whether it sells this kind of product. "
-        + UNTRUSTED,
+        "another country, or not a shop. Then say whether it could stock this exact "
+        "product. " + UNTRUSTED,
         prompt=f"Product: {json.dumps(product)}\n"
         f"Market: {market or 'unknown'}, currency: {currency or 'unknown'}\n"
         f"<page>\n{listing}\n</page>\nReturn one verdict per domain.",

@@ -8,6 +8,7 @@ from backend.fetching import (
     UnsafeURLError,
     ensure_public_url,
     fetch_page,
+    foreign_domain,
     market_country_code,
     normalize_url,
 )
@@ -143,6 +144,15 @@ def test_market_country_comes_from_market_or_domain():
     assert market_country_code("https://mediamarkt.pl/p") == "PL"
     assert market_country_code("https://brand.io/p") is None  # .io is not a country shop
     assert market_country_code("https://us.lacabra.com/p") is None
+
+
+def test_foreign_domains_are_recognised():
+    assert foreign_domain("coolblue.be", "netherlands") == "BE"
+    assert foreign_domain("us.home-appliances.philips", "united kingdom") == "US"
+    assert foreign_domain("fr.fnac.ch", "france") == "CH"
+    assert foreign_domain("johnlewis.com", "united kingdom") is None
+    assert foreign_domain("argos.co.uk", "united kingdom") is None
+    assert foreign_domain("shop.example.de", None) is None
 
 
 async def test_shop_is_asked_for_its_local_price():

@@ -35,13 +35,16 @@ from backend.config import get_settings
 from backend.database import session_scope
 from backend.events import RunLogger
 from backend.extraction import normalize_code, normalize_gtin, read_product_data
-from backend.fetching import FetchError, fetch_page, resolve_host
+from backend.fetching import FetchError, fetch_page, foreign_domain, resolve_host
 from backend.models import Offer, PriceSnapshot, Product, utcnow
 from backend.monitor import fmt_money, read_price
 
 log = logging.getLogger(__name__)
 MAX_ATTEMPTS = 2
 ENOUGH_OFFERS = 2
+# a name-only match (no shared EAN or part number) this far from our price is usually
+# another size, a bundle or an accessory
+MAX_PRICE_GAP_PCT = 50
 MIN_SCREEN_CONFIDENCE = 0.5
 
 
@@ -60,6 +63,7 @@ class DiscoveryState(TypedDict, total=False):
     product_id: int | None
     product: dict  # name, brand, mpn, gtin
     currency: str | None
+    own_price: float | None
     market: str | None
     excluded_domains: list[str]
     tried_queries: list[str]
@@ -121,6 +125,7 @@ async def read_product(state: DiscoveryState, runtime: Runtime[DiscoveryContext]
             },
             "url": own.url if own else None,
             "currency": product.currency,
+            "own_price": own.last_price if own else None,
             "market": product.market,
             "excluded_domains": sorted({o.domain for o in offers}),
             "seen_urls": [o.url for o in offers],
@@ -211,6 +216,7 @@ async def read_product(state: DiscoveryState, runtime: Runtime[DiscoveryContext]
         "product_id": product_id,
         "product": identity,
         "currency": data.currency,
+        "own_price": data.price if data.has_price else None,
         "market": None,
         "excluded_domains": [domain],
         "seen_urls": [url, page.url],
@@ -305,6 +311,21 @@ async def research_market(state: DiscoveryState, runtime: Runtime[DiscoveryConte
                     },
                 )
     suggested = [d for d in state.get("known_retailers", []) if d not in stores]
+    # the search engine only favours the market's country, it doesn't filter by it
+    report = [
+        {
+            "domain": domain,
+            "source": "search" if domain in stores else "knowledge",
+            "kind": "other_market",
+            "kept": False,
+            "reason": f"A shop for another country ({country}).",
+        }
+        for domain in [*stores, *suggested]
+        if (country := foreign_domain(domain, market))
+    ]
+    foreign = {r["domain"] for r in report}
+    stores = {d: store for d, store in stores.items() if d not in foreign}
+    suggested = [d for d in suggested if d not in foreign]
     exists = await asyncio.gather(*(_domain_exists(d) for d in suggested))
     missing = [d for d, ok in zip(suggested, exists, strict=True) if not ok]
     for domain, ok in zip(suggested, exists, strict=True):
@@ -321,10 +342,10 @@ async def research_market(state: DiscoveryState, runtime: Runtime[DiscoveryConte
             usage=run,
         )
         verdicts = {v.domain.lower().removeprefix("www."): v for v in judged}
-    report, retailers = [], []
+    retailers = []
     for domain, store in stores.items():
         v = verdicts.get(domain)
-        keep = bool(v and v.kind in ("online_shop", "brand_shop") and v.sells_this_kind)
+        keep = bool(v and v.kind in ("online_shop", "brand_shop") and v.could_sell_this_product)
         if keep:
             retailers.append(domain)
         report.append(
@@ -494,6 +515,18 @@ async def verify(state: DiscoveryState, runtime: Runtime[DiscoveryContext]) -> d
             if not match.same_product:
                 return c, None, match.reason
             confidence, reason = min(match.confidence, c["confidence"]), match.reason
+            own_price = state.get("own_price")
+            if own_price and abs(gap := (reading.price - own_price) / own_price * 100) > (
+                MAX_PRICE_GAP_PCT
+            ):
+                return (
+                    c,
+                    None,
+                    (
+                        f"The name matches, but the price is {gap:+.0f}% from yours with no shared "
+                        "EAN or part number — probably another size, bundle or edition."
+                    ),
+                )
         offer = {
             "url": reading.page_url,
             "domain": c["domain"],
