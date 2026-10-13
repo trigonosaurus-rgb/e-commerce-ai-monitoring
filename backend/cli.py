@@ -5,10 +5,13 @@ uv run python -m backend.cli set-password client@example.com
 uv run python -m backend.cli export-demo you@example.com demo.json
 uv run python -m backend.cli seed-demo demo.json                  # replaces demo data
 uv run python -m backend.cli access-requests
+uv run python -m backend.cli check-due                            # one round of due checks
 """
 
 import argparse
+import asyncio
 import json
+import logging
 import secrets
 import sys
 from pathlib import Path
@@ -16,6 +19,7 @@ from pathlib import Path
 from sqlmodel import SQLModel, col, select
 
 from backend.auth import ensure_demo_user, hash_password
+from backend.config import ROOT_DIR
 from backend.database import init_db, session_scope
 from backend.models import (
     AccessRequest,
@@ -132,6 +136,26 @@ def list_access_requests() -> None:
             )
 
 
+def check_due() -> None:
+    """Runs the price checks that are due, then exits. Lets a cron job or Windows Task
+    Scheduler collect price history without keeping the web server running."""
+    from backend.scheduler import scheduler
+
+    log_dir = ROOT_DIR / "data" / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler(log_dir / "check-due.log", encoding="utf-8"),
+        ],
+    )
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    checked = asyncio.run(scheduler.tick())
+    logging.getLogger("rivalscope").info("check-due: %s product(s) checked", checked)
+
+
 def main() -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -147,6 +171,7 @@ def main() -> None:
     cmd = sub.add_parser("seed-demo")
     cmd.add_argument("path", type=Path)
     sub.add_parser("access-requests")
+    sub.add_parser("check-due")
     args = parser.parse_args()
 
     init_db()
@@ -161,6 +186,8 @@ def main() -> None:
             seed_demo(args.path)
         case "access-requests":
             list_access_requests()
+        case "check-due":
+            check_due()
 
 
 if __name__ == "__main__":

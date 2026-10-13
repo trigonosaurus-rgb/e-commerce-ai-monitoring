@@ -40,6 +40,8 @@ class Settings(BaseSettings):
     check_interval_hours: float = 12
     alert_min_change_pct: float = 1.0  # smaller price moves are recorded but don't alert
     review_jump_pct: float = 60.0  # bigger jumps are flagged for review instead of trusted
+    # the same page tracked in several workspaces is downloaded once per this window
+    reuse_reading_minutes: float = 60
     max_products_per_user: int = 25
     max_offers_per_product: int = 6
     fetch_timeout_seconds: float = 15

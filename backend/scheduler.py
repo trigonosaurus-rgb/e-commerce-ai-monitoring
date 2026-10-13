@@ -41,7 +41,8 @@ class Scheduler:
                 log.exception("Scheduler tick failed")
             await asyncio.sleep(TICK_SECONDS)
 
-    async def tick(self) -> None:
+    async def tick(self) -> int:
+        """Checks every product with due pages; returns how many products were checked."""
         self.last_tick = utcnow()
         with session_scope() as session:
             due = session.exec(
@@ -52,12 +53,15 @@ class Scheduler:
         by_product: dict[int, list[int]] = defaultdict(list)
         for offer_id, product_id in due:
             by_product[product_id].append(offer_id)
+        checked = 0
         for product_id in list(by_product)[:MAX_PRODUCTS_PER_TICK]:
             try:
                 run = self.begin(product_id, "Scheduled check")
             except CheckAlreadyRunning:
                 continue
             await self.execute(run, product_id, by_product[product_id])
+            checked += 1
+        return checked
 
     def begin(self, product_id: int, label: str) -> RunLogger:
         """Reserves the product and opens a Run (fast, so the API can return its id)."""

@@ -1,3 +1,4 @@
+import uuid
 from datetime import timedelta
 
 import pytest
@@ -93,6 +94,7 @@ def test_alert_kind_detects_undercut():
 @pytest.fixture
 def tracked_product():
     user = make_user()
+    page = uuid.uuid4().hex[:8]  # unique pages: a reading is shared between offers of one URL
     with session_scope() as session:
         product = Product(user_id=user.id, name="Sony WH-1000XM6", currency="EUR")
         session.add(product)
@@ -102,7 +104,7 @@ def tracked_product():
             is_own=True,
             store="me.de",
             domain="me.de",
-            url="https://me.de/p",
+            url=f"https://me.de/{page}",
             status="tracking",
             last_price=95.0,
             currency="EUR",
@@ -111,7 +113,7 @@ def tracked_product():
             product_id=product.id,
             store="rival.de",
             domain="rival.de",
-            url="https://rival.de/p",
+            url=f"https://rival.de/{page}",
             status="tracking",
             last_price=100.0,
             currency="EUR",
@@ -186,3 +188,42 @@ async def test_failed_page_backs_off_and_keeps_going(monkeypatch, tracked_produc
     assert offer.fail_count == 1 and "403" in offer.last_error
     assert timedelta(minutes=25) < offer.next_check_at - utcnow() < timedelta(minutes=35)
     assert run_row.status == "running"  # finishing the run is the scheduler's job
+
+
+@pytest.mark.anyio
+async def test_same_page_in_another_workspace_is_read_once(monkeypatch, tracked_product):
+    user, product, _own, rival = tracked_product
+    other = make_user()
+    with session_scope() as session:
+        copy = Product(user_id=other.id, name="Sony WH-1000XM6", currency="EUR")
+        session.add(copy)
+        session.flush()
+        twin = Offer(
+            product_id=copy.id,
+            store="rival.de",
+            domain="rival.de",
+            url=rival.url,
+            status="tracking",
+            last_price=100.0,
+            currency="EUR",
+        )
+        session.add(twin)
+        session.commit()
+        copy_id, twin_id = copy.id, twin.id
+    downloads = []
+
+    async def fake_read_price(url, usage):
+        downloads.append(url)
+        return reading(97.0), ProductData()
+
+    monkeypatch.setattr(monitor, "read_price", fake_read_price)
+    first = RunLogger.start(user_id=user.id, kind="check", title="t", product_id=product.id)
+    await monitor.check_product(product.id, first, [rival.id])
+    second = RunLogger.start(user_id=other.id, kind="check", title="t", product_id=copy_id)
+    await monitor.check_product(copy_id, second, [twin_id])
+
+    assert downloads == [rival.url]
+    with session_scope() as session:
+        snap = session.exec(select(PriceSnapshot).where(PriceSnapshot.offer_id == twin_id)).one()
+        assert snap.price == 97.0 and snap.run_id == second.run_id
+        assert session.get(Offer, twin_id).last_price == 97.0

@@ -11,7 +11,7 @@ import statistics
 from dataclasses import asdict, dataclass
 from datetime import timedelta
 
-from sqlmodel import select
+from sqlmodel import col, select
 
 from backend import llm, notify
 from backend.config import get_settings
@@ -52,6 +52,7 @@ class Reading:
     evidence: str
     title: str | None
     page_url: str
+    reused_from_minutes: int | None = None  # set when another workspace read it moments ago
 
 
 async def read_price(url: str, usage: llm.UsageSink | None) -> tuple[Reading, ProductData]:
@@ -78,6 +79,38 @@ async def read_price(url: str, usage: llm.UsageSink | None) -> tuple[Reading, Pr
         page_url=page.url,
     )
     return reading, data
+
+
+def recent_reading(url: str, offer_id: int) -> Reading | None:
+    """A fresh, trusted reading of the same page made for another offer (usually another
+    workspace tracking the same store page): reusing it saves a download and API credits."""
+    since = utcnow() - timedelta(minutes=get_settings().reuse_reading_minutes)
+    with session_scope() as session:
+        row = session.exec(
+            select(PriceSnapshot, Offer)
+            .join(Offer, Offer.id == PriceSnapshot.offer_id)
+            .where(
+                Offer.url == url,
+                Offer.id != offer_id,
+                PriceSnapshot.captured_at >= since,
+                col(PriceSnapshot.flagged).is_(False),
+            )
+            .order_by(col(PriceSnapshot.captured_at).desc())
+        ).first()
+    if row is None:
+        return None
+    snap, source = row
+    return Reading(
+        price=snap.price,
+        currency=snap.currency,
+        in_stock=snap.in_stock,
+        method=snap.method,
+        via=snap.fetched_via,
+        evidence=snap.evidence,
+        title=source.title,
+        page_url=url,
+        reused_from_minutes=int((utcnow() - snap.captured_at).total_seconds() // 60),
+    )
 
 
 # ---------------------------------------------------------------- pure decision logic
@@ -221,7 +254,7 @@ async def check_offer(offer_id: int, run: RunLogger) -> tuple[bool, OfferChange 
     with session_scope() as session:
         offer = session.get(Offer, offer_id)
     try:
-        reading, _ = await read_price(offer.url, run)
+        reading = recent_reading(offer.url, offer_id) or (await read_price(offer.url, run))[0]
     except (FetchError, llm.LLMError) as exc:
         with session_scope() as session:
             failed = session.get(Offer, offer_id)
@@ -281,10 +314,12 @@ async def check_offer(offer_id: int, run: RunLogger) -> tuple[bool, OfferChange 
             **details,
         )
     else:
+        source = METHOD_LABELS.get(reading.method, reading.method)
+        if reading.reused_from_minutes is not None:
+            source += f", same page read {reading.reused_from_minutes} min ago for another list"
         run.log(
             "check",
-            f"{offer.store}: {fmt_money(reading.price, reading.currency)} "
-            f"(from {METHOD_LABELS.get(reading.method, reading.method)})",
+            f"{offer.store}: {fmt_money(reading.price, reading.currency)} (from {source})",
             level="success",
             **details,
         )
