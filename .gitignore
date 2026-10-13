@@ -45,3 +45,9 @@ dist/
 # SQLite
 *.sqlite3
 *.db
+
+# Rivalscope
+data/
+.ruff_cache/
+.pytest_cache/
+frontend/out/
