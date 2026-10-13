@@ -132,6 +132,14 @@ export interface Decision {
   kept: boolean;
 }
 
+export interface MarketStore {
+  domain: string;
+  source: "search" | "knowledge";
+  kind: string;
+  kept: boolean;
+  reason: string;
+}
+
 export interface RunEvent {
   seq: number;
   ts: string;
@@ -149,6 +157,8 @@ export interface RunEvent {
     confidence?: number;
     queries?: string[];
     retailers?: string[];
+    query?: string | null;
+    stores?: MarketStore[];
     market?: string | null;
     decisions?: Decision[];
     results?: { title: string; url: string; domain: string; favicon: string | null }[];

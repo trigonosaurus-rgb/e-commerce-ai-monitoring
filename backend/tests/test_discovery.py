@@ -77,7 +77,8 @@ def fake_world(monkeypatch):
         return llm.SearchPlan(
             market_country="germany",
             queries=[f"sony xm6 kaufen {calls['plan']}"],
-            retailer_domains=["https://www.retailer.de/", "my-shop.de"],
+            market_query="Kopfhörer kaufen",
+            retailer_domains=["www.retailer.de", "my-shop.de", "made-up-shop.de"],
             retailer_query="Sony WH-1000XM6",
         )
 
@@ -85,6 +86,12 @@ def fake_world(monkeypatch):
         query, *, country=None, exclude_domains=None, include_domains=None, max_results=8
     ):
         assert country == "germany"
+        if query == "Kopfhörer kaufen":  # market research: who sells headphones right now
+            assert "my-shop.de" in exclude_domains
+            return [
+                result("https://niche-shop.de/kopfhoerer", "Kopfhörer kaufen"),
+                result("https://magazine.de/best-headphones", "Die besten Kopfhörer"),
+            ]
         if include_domains:  # the retailer-restricted search
             calls["retailer_search"] = include_domains
             return [
@@ -121,6 +128,23 @@ def fake_world(monkeypatch):
             )
         return verdicts
 
+    async def fake_classify(product, stores, *, market, currency, usage):
+        calls["classified"] = [s["domain"] for s in stores]
+        return [
+            llm.StoreVerdict(
+                domain=s["domain"],
+                kind="media_or_review" if "magazine" in s["domain"] else "online_shop",
+                sells_this_kind=True,
+                reason="test",
+            )
+            for s in stores
+        ]
+
+    async def fake_resolve(host):
+        if host == "made-up-shop.de":
+            raise OSError("no such domain")
+        return ["93.184.215.14"]
+
     async def fake_compare(ours, theirs, *, usage):
         return llm.ProductMatch(same_product=True, confidence=0.85, reason="Same model name.")
 
@@ -130,6 +154,8 @@ def fake_world(monkeypatch):
     monkeypatch.setattr(llm, "plan_search", fake_plan)
     monkeypatch.setattr(llm, "judge_candidates", fake_judge)
     monkeypatch.setattr(llm, "compare_products", fake_compare)
+    monkeypatch.setattr(llm, "classify_stores", fake_classify)
+    monkeypatch.setattr(discovery, "resolve_host", fake_resolve)
     monkeypatch.setattr(search, "search_web", fake_search)
     return calls
 
@@ -152,9 +178,10 @@ async def test_discovery_retries_and_proposes_verified_offers(fake_world):
     assert run_row.product_id == product.id
     # attempt 1 finds only good-one.de (XM5 has a different EAN, blocked.de fails) → retry
     assert fake_world["plan"] == 2
-    # own domain never searched; retailers named on attempt 1 are not searched again
-    assert fake_world["retailer_search"] == ["retailer.de"]
-    assert fake_world["previous_retailers"] == ["retailer.de"]
+    # research: a shop seen in the live search comes first, the magazine and the
+    # hallucinated domain are dropped, our own shop is never searched
+    assert fake_world["retailer_search"] == ["niche-shop.de", "retailer.de"]
+    assert fake_world["previous_retailers"] == ["niche-shop.de", "retailer.de"]
     by_domain = {o.domain: o for o in offers}
     assert set(by_domain) == {"my-shop.de", "good-one.de", "good-two.de"}
     assert by_domain["my-shop.de"].is_own and by_domain["my-shop.de"].status == "tracking"
@@ -169,6 +196,10 @@ async def test_discovery_retries_and_proposes_verified_offers(fake_world):
     assert any("refurb.de: rejected — Sells it refurbished" in m for m in messages)
     assert any("uk-shop.co.uk: rejected — Sells in GBP" in m for m in messages)
     assert events[-1].step == "propose"
+    research = next(e for e in events if e.step == "research")
+    dropped = {s["domain"]: s["reason"] for s in research.data["stores"] if not s["kept"]}
+    assert set(dropped) == {"magazine.de", "made-up-shop.de"}
+    assert "does not exist" in dropped["made-up-shop.de"]
 
 
 @pytest.mark.anyio

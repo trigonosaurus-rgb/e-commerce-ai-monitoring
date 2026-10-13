@@ -12,7 +12,7 @@ and why numbers in alerts are computed in Python, not by the model.
 import json
 import logging
 from functools import lru_cache
-from typing import Literal, Protocol
+from typing import Annotated, Literal, Protocol
 
 from openai import AsyncOpenAI, OpenAIError
 from pydantic import BaseModel, Field
@@ -111,6 +111,10 @@ EDITIONS = (
 # ----------------------------------------------------------------- search planning
 
 
+# a bare domain: the schema makes the model write "surlatable.com", not "sur la table.com"
+Domain = Annotated[str, Field(pattern=r"^[a-z0-9-]+(\.[a-z0-9-]+)+$")]
+
+
 class SearchPlan(BaseModel):
     market_country: str | None = Field(
         description="Country of the store's market as a lowercase English name "
@@ -121,10 +125,17 @@ class SearchPlan(BaseModel):
         "online stores. Use brand + model, add the GTIN as its own query if known. "
         "Use the market's language for generic words."
     )
-    retailer_domains: list[str] = Field(
-        description="Up to 10 domains of established online retailers in this market that "
-        "plausibly sell this product (e.g. 'otto.de'). No marketplaces, price-comparison "
-        "sites or the manufacturer's info pages."
+    market_query: str = Field(
+        description="A query a shopper in this market types to find online shops for this "
+        "KIND of product, in the market's language (e.g. 'Siebträgermaschine kaufen', "
+        "'gooseneck electric kettle shop'). Leave out the model; name the brand only if it "
+        "is a small brand sold through specialist stockists. It reveals which stores are "
+        "active in this niche right now."
+    )
+    retailer_domains: list[Domain] = Field(
+        description="Up to 10 bare domains (lowercase, no spaces or https://, e.g. 'otto.de') "
+        "of online retailers in this market that plausibly sell this product. No "
+        "marketplaces, price-comparison sites or the manufacturer's info pages."
     )
     retailer_query: str = Field(
         description="A short query (brand + model) to search for the product on those retailers."
@@ -155,6 +166,57 @@ async def plan_search(
         instructions="You plan web searches to find competitor offers for a product.",
         prompt=f"Our store page: {store_url}\nProduct: {json.dumps(product)}{retry}",
     )
+
+
+# ------------------------------------------------------------- market research
+
+
+class StoreVerdict(BaseModel):
+    domain: str
+    kind: Literal[
+        "online_shop",
+        "brand_shop",
+        "marketplace",
+        "price_comparison",
+        "media_or_review",
+        "other_market",
+        "not_a_shop",
+    ]
+    sells_this_kind: bool = Field(description="Sells this kind of product (not just related).")
+    reason: str = Field(description="A few words a store owner would understand.")
+
+
+class StoreVerdicts(BaseModel):
+    stores: list[StoreVerdict]
+
+
+async def classify_stores(
+    product: dict,
+    stores: list[dict],
+    *,
+    market: str | None,
+    currency: str | None,
+    usage: UsageSink | None,
+) -> list[StoreVerdict]:
+    listing = "\n".join(
+        f"- {s['domain']} ({'seen in a live search' if s['source'] == 'search' else 'suggested'})"
+        + (f": {s['title']} — {s['snippet'][:200]}" if s.get("title") else "")
+        for s in stores
+    )
+    result = await _ask(
+        StoreVerdicts,
+        smart=False,
+        usage=usage,
+        instructions="You map the online stores competing in a niche. For every domain say "
+        "what it is: an online shop of this market, a brand's own shop, a marketplace with "
+        "many sellers, a price-comparison site, a magazine/review/blog, a shop serving "
+        "another country, or not a shop. Then say whether it sells this kind of product. "
+        + UNTRUSTED,
+        prompt=f"Product: {json.dumps(product)}\n"
+        f"Market: {market or 'unknown'}, currency: {currency or 'unknown'}\n"
+        f"<page>\n{listing}\n</page>\nReturn one verdict per domain.",
+    )
+    return result.stores
 
 
 # ------------------------------------------------------------- candidate screening

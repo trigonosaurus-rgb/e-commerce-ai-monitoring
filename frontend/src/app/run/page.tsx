@@ -20,6 +20,7 @@ import {
   ShieldCheck,
   Sparkles,
   Square,
+  Store,
   Wand2,
 } from "lucide-react";
 import Link from "next/link";
@@ -32,12 +33,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { clock, duration, money, usd } from "@/lib/format";
 import { useRun, useRunEvents } from "@/lib/queries";
-import type { Decision, Run, RunEvent } from "@/lib/types";
+import type { Decision, MarketStore, Run, RunEvent } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const DISCOVERY_STEPS = [
   { key: "read_product", label: "Read your product", icon: BookOpenText },
   { key: "plan_queries", label: "Plan searches", icon: Wand2 },
+  { key: "research", label: "Research the market", icon: Store },
   { key: "search", label: "Search the web", icon: Search },
   { key: "screen", label: "Screen results", icon: ListChecks },
   { key: "verify", label: "Verify prices", icon: ShieldCheck },
@@ -160,12 +162,72 @@ function Decisions({ decisions }: { decisions: Decision[] }) {
   );
 }
 
+const STORE_KIND_LABEL: Record<string, string> = {
+  online_shop: "online shop",
+  brand_shop: "brand's own shop",
+  marketplace: "marketplace",
+  price_comparison: "price comparison",
+  media_or_review: "magazine / reviews",
+  other_market: "other market",
+  not_a_shop: "not a shop",
+  unknown: "skipped",
+};
+
+function MarketStores({ stores, query }: { stores: MarketStore[]; query?: string | null }) {
+  const [open, setOpen] = useState(false);
+  const kept = stores.filter((s) => s.kept);
+  const dropped = stores.filter((s) => !s.kept);
+  return (
+    <div className="mt-2 grid gap-2">
+      {query && (
+        <Badge variant="outline" className="h-auto w-fit max-w-full font-mono text-[11px] font-normal break-all whitespace-normal">
+          <Search /> {query}
+        </Badge>
+      )}
+      <div className="flex flex-wrap gap-1.5">
+        {kept.map((s) => (
+          <Badge
+            key={s.domain}
+            variant="secondary"
+            className="gap-1 text-[11px] font-normal"
+            title={`${s.source === "search" ? "Found in a live search" : "Known retailer, domain checked"} — ${s.reason}`}
+          >
+            <StoreIcon domain={s.domain} className="size-3" /> {s.domain}
+            {s.source === "search" && <span className="text-success">· live</span>}
+          </Badge>
+        ))}
+      </div>
+      {open &&
+        dropped.map((s) => (
+          <div key={s.domain} className="flex items-start gap-2 text-xs opacity-70">
+            <StoreIcon domain={s.domain} className="mt-px size-3.5" />
+            <span className="min-w-0 flex-1">
+              <span className="font-medium">{s.domain}</span>{" "}
+              <span className="text-muted-foreground">· {STORE_KIND_LABEL[s.kind] ?? s.kind}</span>
+              <span className="block text-muted-foreground">{s.reason}</span>
+            </span>
+          </div>
+        ))}
+      {dropped.length > 0 && (
+        <button
+          onClick={() => setOpen(!open)}
+          className="inline-flex w-fit items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+        >
+          <ChevronDown className={cn("size-3 transition-transform", open && "rotate-180")} />
+          {open ? "Hide" : "Show"} {dropped.length} skipped site{dropped.length === 1 ? "" : "s"} and why
+        </button>
+      )}
+    </div>
+  );
+}
+
 function EventDetails({ event }: { event: RunEvent }) {
   const d = event.data;
   if (!d) return null;
   return (
     <>
-      {(d.queries?.length || d.retailers?.length) && (
+      {d.stores && <MarketStores stores={d.stores} query={d.query} />}
+      {!d.stores && (d.queries?.length || d.retailers?.length) && (
         <div className="mt-2 flex flex-wrap gap-1.5">
           {d.queries?.map((q) => (
             <Badge key={q} variant="outline" className="h-auto max-w-full font-mono text-[11px] font-normal break-all whitespace-normal">

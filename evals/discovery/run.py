@@ -143,7 +143,10 @@ async def run_case(case: dict, user_id: int, meter: TavilyMeter, labels: dict) -
         if e.step == "verify" and e.level == "warning" and e.data
     ]
     plans = [e.data for e in events if e.step == "plan_queries" and e.data]
-    search_errors = [e.message for e in events if e.step == "search" and e.level == "warning"]
+    research = [e.data for e in events if e.step == "research" and e.data]
+    search_errors = [
+        e.message for e in events if e.step in ("search", "research") and e.level == "warning"
+    ]
     proposals = [
         {
             "store": o.domain,
@@ -178,7 +181,14 @@ async def run_case(case: dict, user_id: int, meter: TavilyMeter, labels: dict) -
             else None
         ),
         "queries": [q for p in plans for q in p.get("queries", [])],
-        "retailers": [r for p in plans for r in p.get("retailers", [])],
+        "market_queries": [x.get("query") for x in research if x.get("query")],
+        "retailers": [r for x in research for r in x.get("retailers", [])],
+        "stores_skipped": [
+            f"{s['domain']} ({s['kind']}: {s['reason']})"
+            for x in research
+            for s in x.get("stores", [])
+            if not s["kept"]
+        ],
         "attempts": len(plans),
         "search_errors": search_errors,
         "screened": len(screened),
@@ -245,7 +255,9 @@ def markdown(results: list[dict], account_delta: int | None) -> str:
             f"market {p.get('market')}",
             f"- Status: {r['status']}" + (f" ({r['error']})" if r["error"] else ""),
             f"- Attempts: {r['attempts']} · queries: {'; '.join(r['queries'])}",
-            f"- Retailers guessed: {', '.join(r['retailers']) or '—'}",
+            f"- Market research: {'; '.join(r.get('market_queries', [])) or '—'}",
+            f"- Stores searched for the product: {', '.join(r['retailers']) or '—'}",
+            f"- Sites skipped: {'; '.join(r.get('stores_skipped', []))[:600] or '—'}",
             f"- Screened {r['screened']} pages, kept {r['screen_kept']}",
         ]
         lines += [f"- search error: {m[:160]}" for m in r.get("search_errors", [])]

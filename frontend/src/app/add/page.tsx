@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { ArrowRight, BookOpenText, ListChecks, Search, ShieldCheck, Sparkles, Wand2 } from "lucide-react";
+import { ArrowRight, BookOpenText, ListChecks, Search, ShieldCheck, Sparkles, Store, Wand2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { PageHeader } from "@/components/common";
@@ -14,7 +14,8 @@ import { useInvalidateWorkspace, useMe, useMeta } from "@/lib/queries";
 
 const STEPS = [
   { icon: BookOpenText, text: "Reads your page: product name, brand, EAN and your price" },
-  { icon: Wand2, text: "Plans searches for your market and names likely retailers" },
+  { icon: Wand2, text: "Plans searches for your market and language" },
+  { icon: Store, text: "Researches which stores sell this kind of product right now" },
   { icon: Search, text: "Searches the web and collects candidate stores" },
   { icon: ListChecks, text: "Screens out reviews, marketplaces, other markets and other models" },
   { icon: ShieldCheck, text: "Opens each candidate, reads its price and confirms it's the same product" },

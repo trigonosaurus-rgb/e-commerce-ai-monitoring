@@ -1,12 +1,16 @@
 """Discovery agent: finds the same product in other online stores.
 
-    read_product → plan_queries → search → screen → verify ─┬─> propose
-                        ^                                   │
-                        └──── fewer than 2 matches (max 2 attempts)
+    read_product → plan_queries → research → search → screen → verify ─┬─> propose
+                        ^                                              │
+                        └──────── fewer than 2 matches (max 2 attempts)
 
 * read_product  — reads your page: name, brand, model, EAN and your price.
 * plan_queries  — LLM writes search queries (with feedback on a retry).
-* search        — Tavily web search in the product's market, one result per store.
+* research      — maps the stores active in this niche right now: a live search for this
+                  kind of product in the market, plus retailers the LLM knows (kept only
+                  if the domain exists); the LLM sorts out marketplaces, magazines etc.
+* search        — Tavily web search in the product's market, one result per store, plus a
+                  search restricted to the stores found by `research`.
 * screen        — LLM sorts results: same product / other model / marketplace / article.
 * verify        — opens each shortlisted page, reads its price and confirms it is the same
                   product (EAN match first, LLM comparison only when there is no EAN).
@@ -31,7 +35,7 @@ from backend.config import get_settings
 from backend.database import session_scope
 from backend.events import RunLogger
 from backend.extraction import normalize_code, normalize_gtin, read_product_data
-from backend.fetching import FetchError, fetch_page
+from backend.fetching import FetchError, fetch_page, resolve_host
 from backend.models import Offer, PriceSnapshot, Product, utcnow
 from backend.monitor import fmt_money, read_price
 
@@ -60,7 +64,9 @@ class DiscoveryState(TypedDict, total=False):
     excluded_domains: list[str]
     tried_queries: list[str]
     queries: list[str]
-    retailers: list[str]  # stores the LLM expects to carry the product
+    market_query: str | None  # how shoppers look for this kind of product
+    known_retailers: list[str]  # suggested by the LLM from its own knowledge
+    retailers: list[str]  # stores confirmed by `research`, searched for the product
     retailer_query: str | None
     tried_retailers: list[str]
     seen_urls: list[str]
@@ -239,9 +245,10 @@ async def plan_queries(state: DiscoveryState, runtime: Runtime[DiscoveryContext]
     if gtin and gtin not in state["tried_queries"]:
         queries.append(gtin)
     queries = [q for q in dict.fromkeys(queries) if q not in state["tried_queries"]][:4]
-    retailers = [clean_domain(d) for d in plan.retailer_domains]
+    # the schema already asks for bare domains; this is a second line of defence
+    known = [clean_domain(d) for d in plan.retailer_domains]
     skip = set(tried_retailers) | set(state["excluded_domains"])
-    retailers = [d for d in dict.fromkeys(retailers) if d and d not in skip][:10]
+    known = [d for d in dict.fromkeys(known) if d and d not in skip][:10]
     market = state.get("market") or plan.market_country
     with session_scope() as session:
         product = session.get(Product, state["product_id"])
@@ -251,20 +258,110 @@ async def plan_queries(state: DiscoveryState, runtime: Runtime[DiscoveryContext]
     run.log(
         "plan_queries",
         f"Searching {len(queries)} queries"
-        + (f" in the {market.title()} market" if market else "")
-        + (f" and {len(retailers)} likely retailers" if retailers else ""),
+        + (f" in the {market.title()} market" if market else ""),
         queries=queries,
-        retailers=retailers,
         market=market,
     )
     return {
         "queries": queries,
         "tried_queries": state["tried_queries"] + queries,
-        "retailers": retailers,
+        "market_query": plan.market_query.strip() or None,
+        "known_retailers": known,
         "retailer_query": plan.retailer_query,
-        "tried_retailers": tried_retailers + retailers,
         "market": market,
         "attempt": attempt,
+    }
+
+
+async def _domain_exists(domain: str) -> bool:
+    try:
+        return bool(await asyncio.wait_for(resolve_host(domain), timeout=5))
+    except Exception:
+        return False
+
+
+async def research_market(state: DiscoveryState, runtime: Runtime[DiscoveryContext]) -> dict:
+    run = runtime.context.run
+    market = state.get("market")
+    skip = set(state.get("tried_retailers", [])) | set(state["excluded_domains"])
+    stores: dict[str, dict] = {}
+    if query := state.get("market_query"):
+        try:
+            results = await search.search_web(
+                query, country=market, exclude_domains=sorted(skip), max_results=20
+            )
+        except Exception as exc:
+            results = []
+            run.log("research", f"Market search for “{query}” failed: {exc}", level="warning")
+        for r in results:
+            if r.domain not in skip:
+                stores.setdefault(
+                    r.domain,
+                    {
+                        "domain": r.domain,
+                        "title": r.title,
+                        "snippet": r.snippet,
+                        "source": "search",
+                    },
+                )
+    suggested = [d for d in state.get("known_retailers", []) if d not in stores]
+    exists = await asyncio.gather(*(_domain_exists(d) for d in suggested))
+    missing = [d for d, ok in zip(suggested, exists, strict=True) if not ok]
+    for domain, ok in zip(suggested, exists, strict=True):
+        if ok:
+            stores[domain] = {"domain": domain, "source": "knowledge"}
+
+    verdicts = {}
+    if stores:
+        judged = await llm.classify_stores(
+            state["product"],
+            list(stores.values()),
+            market=market,
+            currency=state.get("currency"),
+            usage=run,
+        )
+        verdicts = {v.domain.lower().removeprefix("www."): v for v in judged}
+    report, retailers = [], []
+    for domain, store in stores.items():
+        v = verdicts.get(domain)
+        keep = bool(v and v.kind in ("online_shop", "brand_shop") and v.sells_this_kind)
+        if keep:
+            retailers.append(domain)
+        report.append(
+            {
+                "domain": domain,
+                "source": store["source"],
+                "kind": v.kind if v else "unknown",
+                "kept": keep,
+                "reason": v.reason if v else "No verdict from the model.",
+            }
+        )
+    report += [
+        {
+            "domain": d,
+            "source": "knowledge",
+            "kind": "unknown",
+            "kept": False,
+            "reason": "Suggested by the model, but the domain does not exist.",
+        }
+        for d in missing
+    ]
+    # stores seen in the live search first: they sell this kind of product right now
+    retailers = sorted(retailers, key=lambda d: stores[d]["source"] != "search")[:15]
+    live = sum(1 for d in retailers if stores[d]["source"] == "search")
+    run.log(
+        "research",
+        f"{len(retailers)} stores sell this kind of product"
+        + (f" in the {market.title()} market" if market else "")
+        + f": {live} found by a live search, {len(retailers) - live} known retailers",
+        level="success" if retailers else "warning",
+        query=query,
+        retailers=retailers,
+        stores=report,
+    )
+    return {
+        "retailers": retailers,
+        "tried_retailers": state.get("tried_retailers", []) + retailers,
     }
 
 
@@ -506,13 +603,15 @@ def build_graph():
     graph = StateGraph(DiscoveryState, context_schema=DiscoveryContext)
     graph.add_node("read_product", read_product)
     graph.add_node("plan_queries", plan_queries)
+    graph.add_node("research", research_market)
     graph.add_node("search", search_stores)
     graph.add_node("screen", screen)
     graph.add_node("verify", verify)
     graph.add_node("propose", propose)
     graph.add_edge(START, "read_product")
     graph.add_edge("read_product", "plan_queries")
-    graph.add_edge("plan_queries", "search")
+    graph.add_edge("plan_queries", "research")
+    graph.add_edge("research", "search")
     graph.add_edge("search", "screen")
     graph.add_edge("screen", "verify")
     graph.add_conditional_edges("verify", after_verify, ["plan_queries", "propose"])
