@@ -418,10 +418,19 @@ async def verify(state: DiscoveryState, runtime: Runtime[DiscoveryContext]) -> d
                 evidence=offer["evidence"][:300],
                 confidence=offer["confidence"],
                 method=offer["method"],
+                store=c["domain"],
+                reason=reason,
             )
         else:
             notes.append(f"{c['domain']}: {reason}")
-            run.log("verify", f"{c['domain']}: rejected — {reason}", level="warning", url=c["url"])
+            run.log(
+                "verify",
+                f"{c['domain']}: rejected — {reason}",
+                level="warning",
+                url=c["url"],
+                store=c["domain"],
+                reason=reason,
+            )
     return {"verified": verified, "rejections": state["rejections"] + notes}
 
 

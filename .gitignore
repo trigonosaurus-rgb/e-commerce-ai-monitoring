@@ -51,3 +51,6 @@ data/
 .ruff_cache/
 .pytest_cache/
 frontend/out/
+
+# Playwright MCP screenshots/logs
+.playwright-mcp/

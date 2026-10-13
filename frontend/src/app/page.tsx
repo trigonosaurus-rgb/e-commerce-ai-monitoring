@@ -1,224 +1,246 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import axios from "axios";
-import { Terminal, Globe, Search, ShoppingBag, Lightbulb, Play } from "lucide-react";
+import { Bell, Bot, ChevronRight, CircleAlert, Radar, ScanSearch, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 
-interface LogEntry {
-  text: string;
-  time: string;
-}
+import { AddProductButton } from "@/components/app-shell";
+import { Sparkline } from "@/components/charts";
+import {
+  EmptyState,
+  LoadingBlock,
+  PageHeader,
+  PositionBadge,
+  QueryError,
+  RunStatusBadge,
+} from "@/components/common";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { money, timeAgo, usd } from "@/lib/format";
+import { useAlerts, useDashboard, useMe, useProducts, useRuns } from "@/lib/queries";
+import type { ProductSummary } from "@/lib/types";
 
-interface Competitor {
-  id: number;
-  name: string;
-  url: string;
-  extracted_pricing_info: string;
-}
-
-interface Recommendation {
-  id: number;
-  strategy: string;
-  actionable_steps: string;
-}
-
-interface TaskResult {
-  task: any;
-  competitors: Competitor[];
-  recommendations: Recommendation;
-}
-
-export default function Home() {
-  const [url, setUrl] = useState("");
-  const [taskId, setTaskId] = useState<number | null>(null);
-  const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [result, setResult] = useState<TaskResult | null>(null);
-  const logsEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Auto-scroll logs
-    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [logs]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!url) return;
-
-    setLogs([]);
-    setResult(null);
-    setIsProcessing(true);
-
-    try {
-      // 1. Create task
-      const res = await axios.post("http://localhost:8000/tasks", { url });
-      const newTaskId = res.data.id;
-      setTaskId(newTaskId);
-
-      // 2. Connect to SSE
-      const eventSource = new EventSource(`http://localhost:8000/stream_task/${newTaskId}`);
-      
-      eventSource.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.log) {
-          setLogs((prev) => [...prev, { text: data.log, time: new Date().toLocaleTimeString() }]);
-        }
-        
-        if (data.status === "completed" || data.status === "failed") {
-          eventSource.close();
-          setIsProcessing(false);
-          if (data.status === "completed") {
-            fetchFinalResult(newTaskId);
-          }
-        }
-      };
-
-      eventSource.onerror = () => {
-        eventSource.close();
-        setIsProcessing(false);
-        setLogs((prev) => [...prev, { text: "Connection error.", time: new Date().toLocaleTimeString() }]);
-      };
-
-    } catch (error) {
-      console.error(error);
-      setIsProcessing(false);
-      alert("Failed to start research.");
-    }
-  };
-
-  const fetchFinalResult = async (id: number) => {
-    try {
-      const res = await axios.get(`http://localhost:8000/tasks/${id}`);
-      setResult(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
+function Kpi({ label, value, hint }: { label: string; value: React.ReactNode; hint?: string }) {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 p-8 font-sans">
-      <div className="max-w-6xl mx-auto space-y-8">
-        
-        <header className="text-center space-y-4">
-          <div className="inline-flex items-center justify-center p-3 bg-blue-600 rounded-full mb-2">
-            <Globe className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">
-            Autonomous E-Commerce AI Researcher
-          </h1>
-          <p className="text-lg text-slate-500 max-w-2xl mx-auto">
-            Give us your store URL. Our AI will analyze your niche, hunt down your competitors, bypass their bot protection, scrape their prices, and formulate a winning strategy for you.
-          </p>
-        </header>
+    <Card size="sm">
+      <CardContent>
+        <div className="text-xs text-muted-foreground">{label}</div>
+        <div className="mt-1 text-2xl font-semibold tracking-tight">{value}</div>
+        {hint && <div className="mt-0.5 text-xs text-muted-foreground">{hint}</div>}
+      </CardContent>
+    </Card>
+  );
+}
 
-        {/* Input Form */}
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <div className="flex space-x-4">
-            <input
-              type="url"
-              placeholder="https://your-store.com"
-              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              required
-              disabled={isProcessing}
-            />
-            <button
-              type="submit"
-              disabled={isProcessing}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-8 py-3 rounded-xl font-semibold flex items-center space-x-2 transition-colors"
-            >
-              {isProcessing ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Researching...</span>
-                </>
-              ) : (
-                <>
-                  <Play className="w-5 h-5 fill-current" />
-                  <span>Start AI Agent</span>
-                </>
-              )}
-            </button>
-          </div>
-        </form>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          
-          {/* Terminal / Live Logs */}
-          <div className="bg-slate-900 rounded-2xl shadow-xl overflow-hidden flex flex-col h-[600px]">
-            <div className="bg-slate-800 px-4 py-3 flex items-center space-x-2 border-b border-slate-700">
-              <Terminal className="w-4 h-4 text-slate-400" />
-              <span className="text-sm font-medium text-slate-300">Agent Thoughts Terminal</span>
-              <div className="flex-1" />
-              {isProcessing && <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />}
-            </div>
-            <div className="p-4 flex-1 overflow-y-auto font-mono text-sm space-y-3">
-              {logs.length === 0 ? (
-                <p className="text-slate-600 italic">Awaiting instructions...</p>
-              ) : (
-                logs.map((log, i) => (
-                  <div key={i} className="flex space-x-3">
-                    <span className="text-slate-500 shrink-0">[{log.time}]</span>
-                    <span className="text-green-400">{log.text}</span>
-                  </div>
-                ))
-              )}
-              <div ref={logsEndRef} />
-            </div>
-          </div>
-
-          {/* Results Area */}
-          <div className="h-[600px] overflow-y-auto space-y-6">
-            {!result ? (
-              <div className="h-full flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl">
-                <Search className="w-12 h-12 mb-4 opacity-50" />
-                <p>Final report will appear here once research completes.</p>
-              </div>
-            ) : (
-              <>
-                {/* Competitors List */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                  <div className="flex items-center space-x-2 mb-6">
-                    <ShoppingBag className="w-6 h-6 text-blue-600" />
-                    <h2 className="text-xl font-bold">Identified Competitors</h2>
-                  </div>
-                  <div className="space-y-4">
-                    {result.competitors.length === 0 ? (
-                      <p className="text-slate-500 italic">No competitors found.</p>
-                    ) : (
-                      result.competitors.map((comp) => (
-                        <div key={comp.id} className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                          <a href={comp.url} target="_blank" rel="noreferrer" className="text-lg font-bold text-blue-600 hover:underline">
-                            {comp.name}
-                          </a>
-                          <p className="text-sm text-slate-600 mt-2">{comp.extracted_pricing_info}</p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                {/* AI Recommendation */}
-                {result.recommendations && (
-                  <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-2xl shadow-lg text-white">
-                    <div className="flex items-center space-x-2 mb-6">
-                      <Lightbulb className="w-6 h-6 text-yellow-300" />
-                      <h2 className="text-xl font-bold">AI Strategy & Actions</h2>
-                    </div>
-                    <div className="space-y-4">
-                      <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
-                        <p className="whitespace-pre-wrap">{result.recommendations.actionable_steps}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </>
+function ProductRow({ product }: { product: ProductSummary }) {
+  const p = product.position;
+  return (
+    <Link
+      href={`/product/?id=${product.id}`}
+      className="group grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 px-4 py-3.5 transition-colors hover:bg-muted/50 md:grid-cols-[minmax(0,2.2fr)_1fr_1fr_auto_auto_auto]"
+    >
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-white">
+          {product.image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={product.image_url} alt="" className="size-full object-contain" loading="lazy" />
+          ) : (
+            <Radar className="size-5 text-muted-foreground" />
+          )}
+        </div>
+        <div className="min-w-0">
+          <div className="truncate font-medium">{product.name}</div>
+          <div className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
+            <span>{product.tracking} competitor{product.tracking === 1 ? "" : "s"}</span>
+            {product.proposed > 0 && (
+              <Badge className="h-4 bg-primary/12 px-1.5 text-[10px] text-primary">
+                {product.proposed} to review
+              </Badge>
+            )}
+            {product.attention > 0 && (
+              <span className="inline-flex items-center gap-0.5 text-warning">
+                <CircleAlert className="size-3" /> {product.attention} need attention
+              </span>
             )}
           </div>
-
         </div>
       </div>
+      <div className="hidden md:block">
+        <div className="text-[11px] text-muted-foreground">Your price</div>
+        <div className="font-medium tabular">{money(p.own_price, product.currency)}</div>
+      </div>
+      <div className="hidden md:block">
+        <div className="text-[11px] text-muted-foreground">Cheapest rival</div>
+        <div className="truncate font-medium tabular">
+          {money(p.lowest, product.currency)}
+          {product.lowest_store && (
+            <span className="ml-1 text-xs font-normal text-muted-foreground">{product.lowest_store}</span>
+          )}
+        </div>
+      </div>
+      <div className="hidden lg:block" title="Cheapest competitor, last 14 days">
+        <Sparkline values={product.trend.map((t) => t.lowest)} />
+      </div>
+      <PositionBadge position={p} />
+      <ChevronRight className="hidden size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 md:block" />
+    </Link>
+  );
+}
+
+function HowItWorks() {
+  const steps = [
+    { icon: ScanSearch, title: "Paste your product link", text: "The agent reads your page: model, EAN and price." },
+    { icon: Bot, title: "The agent finds rivals", text: "It searches your market, screens results and verifies each store's price. You approve the matches." },
+    { icon: ShieldCheck, title: "Prices you can audit", text: "Scheduled checks store every price with the page fragment it came from. Changes trigger alerts." },
+  ];
+  return (
+    <div className="grid gap-3 md:grid-cols-3">
+      {steps.map(({ icon: Icon, title, text }, i) => (
+        <Card key={title} size="sm">
+          <CardContent className="flex gap-3">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Icon className="size-4" />
+            </span>
+            <div>
+              <div className="text-sm font-medium">
+                <span className="text-muted-foreground">{i + 1}.</span> {title}
+              </div>
+              <div className="mt-0.5 text-xs text-muted-foreground">{text}</div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  const { data: me } = useMe();
+  const dashboard = useDashboard();
+  const products = useProducts();
+  const runs = useRuns();
+  const alerts = useAlerts();
+  const d = dashboard.data;
+
+  return (
+    <>
+      <PageHeader
+        title="Dashboard"
+        description={
+          me?.demo
+            ? "A live workspace monitoring real products in German online stores."
+            : "Where your prices stand against the market right now."
+        }
+        actions={<AddProductButton />}
+      />
+
+      {d && d.products > 0 && (
+        <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
+          <Kpi label="Products" value={d.products} hint={`${d.competitors} competitor pages`} />
+          <Kpi
+            label="You're cheapest"
+            value={`${d.positions.cheapest ?? 0} / ${d.products}`}
+            hint={`${d.positions.above_market ?? 0} above market`}
+          />
+          <Kpi label="Alerts · 7 days" value={d.alerts_7d} hint={`${d.unread_alerts} unread`} />
+          <Kpi label="Price checks · 7 days" value={d.checks_7d} hint={`last ${timeAgo(d.last_check_at)}`} />
+          <Kpi label="AI cost · 30 days" value={usd(d.cost_30d_usd)} hint="all agent runs" />
+        </div>
+      )}
+
+      {products.error ? (
+        <QueryError error={products.error} retry={() => products.refetch()} />
+      ) : !products.data ? (
+        <LoadingBlock />
+      ) : products.data.length === 0 ? (
+        <div className="grid gap-6">
+          <EmptyState
+            icon={Radar}
+            title={me?.demo ? "The demo data is being prepared" : "No products yet"}
+            action={<AddProductButton />}
+          >
+            {me?.demo
+              ? "Real price history is being collected. Meanwhile, see how it works below."
+              : "Add a product page from your store and the agent will find where else it is sold."}
+          </EmptyState>
+          <HowItWorks />
+        </div>
+      ) : (
+        <Card className="gap-0 py-0">
+          <div className="divide-y">
+            {products.data.map((product) => (
+              <ProductRow key={product.id} product={product} />
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {(runs.data?.length || alerts.data?.items.length) ? (
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Agent activity</CardTitle>
+              <Link href="/activity/" className="text-xs text-muted-foreground hover:text-foreground">
+                View all
+              </Link>
+            </CardHeader>
+            <CardContent className="grid gap-1">
+              {runs.data?.slice(0, 5).map((run) => (
+                <Link
+                  key={run.id}
+                  href={`/run/?id=${run.id}`}
+                  className="flex min-w-0 items-center gap-3 rounded-lg px-2 py-2 text-sm hover:bg-muted/60"
+                >
+                  {run.kind === "discovery" ? (
+                    <Bot className="size-4 shrink-0 text-primary" />
+                  ) : (
+                    <Radar className="size-4 shrink-0 text-muted-foreground" />
+                  )}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate">{run.title}</span>
+                    <span className="block truncate text-xs text-muted-foreground">
+                      {run.summary ?? run.error ?? "…"}
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-right">
+                    <RunStatusBadge status={run.status} />
+                    <span className="block text-[11px] text-muted-foreground">{timeAgo(run.started_at)}</span>
+                  </span>
+                </Link>
+              ))}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Latest alerts</CardTitle>
+              <Link href="/alerts/" className="text-xs text-muted-foreground hover:text-foreground">
+                View all
+              </Link>
+            </CardHeader>
+            <CardContent className="grid gap-1">
+              {alerts.data?.items.length === 0 && (
+                <p className="px-2 py-6 text-center text-sm text-muted-foreground">
+                  <Bell className="mx-auto mb-2 size-5" />
+                  No price changes yet.
+                </p>
+              )}
+              {alerts.data?.items.slice(0, 4).map((alert) => (
+                <Link
+                  key={alert.id}
+                  href={alert.product_id ? `/product/?id=${alert.product_id}` : "/alerts/"}
+                  className="min-w-0 rounded-lg px-2 py-2 hover:bg-muted/60"
+                >
+                  <div className="flex items-start gap-2 text-sm">
+                    {!alert.read && <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />}
+                    <span className="flex-1 font-medium">{alert.title}</span>
+                    <span className="shrink-0 text-[11px] text-muted-foreground">{timeAgo(alert.created_at)}</span>
+                  </div>
+                  <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{alert.message}</p>
+                </Link>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      ) : null}
+    </>
   );
 }
