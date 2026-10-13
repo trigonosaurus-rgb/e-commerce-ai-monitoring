@@ -1,0 +1,72 @@
+[
+  {
+    "id": "us-lodge-skillet",
+    "market": "US",
+    "niche": "Kitchen, branded, UPC on the page",
+    "url": "https://www.abt.com/Lodge-10.25-Cast-Iron-Skillet-L8SK3/p/81755.html",
+    "expect": "Several US stores; UPC 075536300801 should confirm matches."
+  },
+  {
+    "id": "us-hoka-clifton",
+    "market": "US",
+    "niche": "Running shoes: sizes and colourways, no codes on the page",
+    "url": "https://www.runningwarehouse.com/HOKA_Clifton_10/descpage-H10CM15.html",
+    "expect": "Same model AND colourway; other colours or Clifton 9/11 are wrong matches."
+  },
+  {
+    "id": "us-fellow-kettle",
+    "market": "US",
+    "niche": "Specialty coffee shop (Shopify), shop name in the brand field",
+    "url": "https://us.lacabra.com/products/fellow-stagg-ekg-2",
+    "expect": "Stagg EKG (not EKG Pro / Corvo / Studio edition), new, in USD."
+  },
+  {
+    "id": "uk-ninja-airfryer",
+    "market": "UK",
+    "niche": "Small appliance, shop SKU instead of the maker's model code",
+    "url": "https://www.euronics.co.uk/catalogue/small-appliances/small-cooking-appliances/air-fryers/ninja-af100uk-38l-air-fryer-and-dehydrator-grey/p/NINAF100UK",
+    "expect": "Ninja AF100UK in GBP; AF101UK / AF160UK / Foodi models are wrong."
+  },
+  {
+    "id": "uk-helen-round-towel",
+    "market": "UK",
+    "niche": "Small designer brand without EAN, sold by gift shops",
+    "url": "https://countrylivingshop.co.uk/products/winter-fox-linen-tea-towel",
+    "expect": "Same Helen Round 'Winter Fox' design; other designs of the same maker are wrong."
+  },
+  {
+    "id": "uk-lakeland-tin",
+    "market": "UK",
+    "niche": "Shop's own brand (negative control)",
+    "url": "https://www.lakeland.co.uk/products/lakeland-brownie-traybake-tin",
+    "expect": "Likely no other seller. Generic brownie tins of other brands must be rejected."
+  },
+  {
+    "id": "fr-seb-pressure-cooker",
+    "market": "France",
+    "niche": "Cookware, EAN, French-language shop",
+    "url": "https://www.boulanger.com/ref/1230647",
+    "expect": "SEB ClipsoMinut' Gourmande 7.5 L; other capacities (6 L, 9 L) are wrong."
+  },
+  {
+    "id": "fr-ordinary-serum",
+    "market": "France",
+    "niche": "Cosmetics in an online pharmacy, EAN",
+    "url": "https://www.redcare-pharmacie.fr/beaute/BE04657888/the-ordinary-niacinamide-10-zinc-1.htm",
+    "expect": "30 ml in EUR; the 60 ml bottle is a different product."
+  },
+  {
+    "id": "nl-philips-airfryer",
+    "market": "Netherlands",
+    "niche": "Appliance, no EAN in the page data, possibly discontinued",
+    "url": "https://www.coolblue.nl/en/product/878234/philips-airfryer-l-hd9252-70.html",
+    "expect": "HD9252/70 in Dutch stores; /90 /91 colour codes are other variants."
+  },
+  {
+    "id": "pl-logitech-mouse",
+    "market": "Poland",
+    "niche": "Electronics, EAN, currency PLN",
+    "url": "https://mediamarkt.pl/pl/product/_mysz-logitech-mx-master-3s-bluetooth-edition-grafitowy-1497571.html",
+    "expect": "MX Master 3S SE Bluetooth Edition (910-007501) in PLN; the regular 3S is a different SKU."
+  }
+]

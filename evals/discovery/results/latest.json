@@ -1,0 +1,1227 @@
+[
+ {
+  "id": "us-lodge-skillet",
+  "market": "US",
+  "niche": "Kitchen, branded, UPC on the page",
+  "url": "https://www.abt.com/Lodge-10.25-Cast-Iron-Skillet-L8SK3/p/81755.html",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Lodge 10.25\" Cast Iron Skillet - L8SK3",
+   "brand": "Lodge",
+   "gtin": "0075536300801",
+   "mpn": "L8SK3",
+   "market": "united states",
+   "price": 24.9,
+   "currency": "USD"
+  },
+  "queries": [
+   "Lodge L8SK3 10.25 cast iron skillet",
+   "Lodge 10.25 inch seasoned cast iron skillet L8SK3",
+   "0075536300801"
+  ],
+  "market_queries": [
+   "10.25 inch cast iron skillet buy"
+  ],
+  "retailers": [
+   "whisknyc.com",
+   "mastgeneralstore.com",
+   "lehmans.com",
+   "larderandvine.com",
+   "homedepot.com",
+   "costco.com",
+   "shop.metropolitan-market.com",
+   "target.com",
+   "shop.harmonsgrocery.com",
+   "lodgecastiron.com",
+   "kohls.com",
+   "macys.com",
+   "surlatable.com",
+   "williams-sonoma.com",
+   "acehardware.com"
+  ],
+  "stores_skipped": [
+   "lodgecookware.com.au (other_market: A shop for another country (AU).)",
+   "amazon.com (marketplace: Marketplace listings include Lodge cookware.)",
+   "youtube.com (media_or_review: Video review platform, not a product shop.)",
+   "fieldcompany.com (brand_shop: Own-brand cast iron shop; does not sell Lodge.)",
+   "logotech.com (other_market: Promotional products and branded gift sets, not a cookware retailer.)",
+   "walmart.com (marketplace: Marketplace offers the Lodge skillet.)",
+   "reddit.com (media_or_review: Discussion forum, not a product shop.)"
+  ],
+  "attempts": 1,
+  "search_errors": [],
+  "screened": 20,
+  "screen_kept": 7,
+  "verify_rejected": [
+   {
+    "store": "homedepot.com",
+    "url": "https://www.homedepot.com/p/Lodge-10-25-in-Cast-Iron-Skillet-in-Black-with-Pour-Spout-L8SK3/301036400",
+    "reason": "Couldn't load the page: HTTP 403; the backup reader (Tavily) was blocked too."
+   },
+   {
+    "store": "acehardware.com",
+    "url": "https://www.acehardware.com/departments/home-and-decor/small-appliances/griddles/6102974",
+    "reason": "Couldn't load the page: HTTP 403; the backup reader (Tavily) was blocked too."
+   },
+   {
+    "store": "target.com",
+    "url": "https://www.target.com/p/lodge-10-25-34-cast-iron-skillet/-/A-10291925",
+    "reason": "No price found on the page."
+   },
+   {
+    "store": "katom.com",
+    "url": "https://www.katom.com/261-L8SK3.html",
+    "reason": "This doesn't look like a single product page."
+   }
+  ],
+  "proposals": [
+   {
+    "store": "rainsofojai.com",
+    "url": "https://rainsofojai.com/10-25-cast-iron-skillet-l8sk3-lodge",
+    "title": "10.25 in Cast Iron Skillet",
+    "price": 46.0,
+    "currency": "USD",
+    "confidence": 0.99,
+    "reason": "Same EAN/GTIN code on both pages.",
+    "score": "correct"
+   },
+   {
+    "store": "shop.harmonsgrocery.com",
+    "url": "https://shop.harmonsgrocery.com/store/harmons/products/169296-lodge-cast-iron-10-25-cast-iron-skillet-1-ea",
+    "title": "Lodge Cast Iron 10.25\" Cast Iron Skillet",
+    "price": 39.99,
+    "currency": "USD",
+    "confidence": 0.94,
+    "reason": "Both listings identify Lodge’s 10.25-inch cast-iron skillet, with no variant or edition difference indicated.",
+    "score": "correct"
+   },
+   {
+    "store": "bar-b-que.com",
+    "url": "https://www.bar-b-que.com/lodge-l8sk3-logic-cast-iron-skillet-10-31-in",
+    "title": "Lodge L8SK3 Logic Cast Iron Skillet 10.31 in.",
+    "price": 29.99,
+    "currency": "USD",
+    "confidence": 0.9,
+    "reason": "Same manufacturer part number (L8SK3).",
+    "score": "correct"
+   }
+  ],
+  "correct": 3,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 2,
+  "tavily_cached_calls": 9,
+  "llm_cost_usd": 0.0034,
+  "seconds": 36
+ },
+ {
+  "id": "us-hoka-clifton",
+  "market": "US",
+  "niche": "Running shoes: sizes and colourways, no codes on the page",
+  "url": "https://www.runningwarehouse.com/HOKA_Clifton_10/descpage-H10CM15.html",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "HOKA Clifton 10",
+   "brand": "HOKA",
+   "gtin": null,
+   "mpn": null,
+   "market": "united states",
+   "price": 104.88,
+   "currency": "USD"
+  },
+  "queries": [
+   "HOKA Clifton 10 men's shoes",
+   "HOKA Clifton 10 Raw Linen Stone men's"
+  ],
+  "market_queries": [
+   "men's running shoes shop"
+  ],
+  "retailers": [
+   "shoecarnival.com",
+   "dickssportinggoods.com",
+   "zappos.com",
+   "marathonsports.com",
+   "steepandcheap.com",
+   "fit2run.com",
+   "therunhouse.com",
+   "finishline.com",
+   "roadrunnersports.com",
+   "fleetfeet.com",
+   "rei.com",
+   "backcountry.com",
+   "nordstrom.com",
+   "holabirdsports.com"
+  ],
+  "stores_skipped": [
+   "newbalance.com (brand_shop: New Balance’s own-brand store.)",
+   "adidas.com (brand_shop: Adidas’s own-brand store.)",
+   "asics.com (brand_shop: ASICS’s own-brand store.)",
+   "nike.com (brand_shop: Nike’s own-brand store.)",
+   "brooksrunning.com (brand_shop: Brooks’s own-brand store.)",
+   "on.com (brand_shop: On’s own-brand store.)",
+   "saucony.com (brand_shop: Saucony’s own-brand store.)",
+   "altrarunning.com (brand_shop: Altra’s own-brand store.)",
+   "yelp.com (not_a_shop: Business listings and reviews, not a retailer.)"
+  ],
+  "attempts": 1,
+  "search_errors": [],
+  "screened": 25,
+  "screen_kept": 9,
+  "verify_rejected": [
+   {
+    "store": "hoka.com",
+    "url": "https://www.hoka.com/en/us/mens-everyday-running-gear/clifton-10/1162030.html",
+    "reason": "Couldn't load the page: HTTP 403; the backup reader (Tavily) was blocked too."
+   },
+   {
+    "store": "footlocker.com",
+    "url": "https://www.footlocker.com/product/model/hoka-clifton-10-mens/440858.html",
+    "reason": "Page not found (HTTP 404) — the product may have been removed."
+   },
+   {
+    "store": "rei.com",
+    "url": "https://www.rei.com/product/242661/hoka-clifton-10-road-running-shoes-mens",
+    "reason": "Couldn't load the page: HTTP 403; the backup reader (Tavily) was blocked too."
+   }
+  ],
+  "proposals": [
+   {
+    "store": "therunhouse.com",
+    "url": "https://therunhouse.com/products/men-s-clifton-10-raw-linen-stone",
+    "title": "HOKA Men's Clifton 10 - RAW LINEN / STONE",
+    "price": 103.95,
+    "currency": "USD",
+    "confidence": 0.99,
+    "reason": "Both listings are HOKA Clifton 10 men's shoes in Raw Linen/Stone; no model or variant difference is indicated.",
+    "score": "correct"
+   },
+   {
+    "store": "shop.rrrc.run",
+    "url": "https://shop.rrrc.run/product/5404456/hoka/mens-clifton-10",
+    "title": "Men's Clifton 10",
+    "price": 124.0,
+    "currency": "USD",
+    "confidence": 0.97,
+    "reason": "Both listings are HOKA Clifton 10 men's shoes in Raw Linen/Stone.",
+    "score": "correct"
+   },
+   {
+    "store": "zappos.com",
+    "url": "https://www.zappos.com/p/mens-hoka-clifton-10/product/9984276",
+    "title": "Clifton 10",
+    "price": 108.5,
+    "currency": "USD",
+    "confidence": 0.96,
+    "reason": "Both listings are the men's HOKA Clifton 10; the Zappos listing does not specify a color variant.",
+    "score": "correct"
+   },
+   {
+    "store": "roadrunnersports.com",
+    "url": "https://www.roadrunnersports.com/product/47718/mens-hoka-clifton-10",
+    "title": "Men's HOKA Clifton 10",
+    "price": 109.95,
+    "currency": "USD",
+    "confidence": 0.94,
+    "reason": "Both listings are men's HOKA Clifton 10 running shoes; the second listing does not specify a color, so no variant conflict is evident.",
+    "score": "correct"
+   },
+   {
+    "store": "fleetfeet.com",
+    "url": "https://www.fleetfeet.com/products/mens-hoka-clifton-10",
+    "title": "Men's | HOKA Clifton 10",
+    "price": 116.25,
+    "currency": "USD",
+    "confidence": 0.93,
+    "reason": "Both listings are HOKA Clifton 10 men's shoes; the second listing does not specify a color variant, so no conflict is indicated.",
+    "score": "correct"
+   }
+  ],
+  "correct": 5,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 2,
+  "tavily_cached_calls": 4,
+  "llm_cost_usd": 0.0017,
+  "seconds": 39
+ },
+ {
+  "id": "us-fellow-kettle",
+  "market": "US",
+  "niche": "Specialty coffee shop (Shopify), shop name in the brand field",
+  "url": "https://us.lacabra.com/products/fellow-stagg-ekg-2",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Fellow Stagg EKG",
+   "brand": null,
+   "gtin": null,
+   "mpn": null,
+   "market": "united states",
+   "price": 165.0,
+   "currency": "USD"
+  },
+  "queries": [
+   "Fellow Stagg EKG kettle",
+   "Fellow Stagg EKG electric kettle buy",
+   "Fellow Stagg EKG kettle for sale"
+  ],
+  "market_queries": [
+   "electric gooseneck kettle shop"
+  ],
+  "retailers": [
+   "target.com",
+   "bonescoffee.com",
+   "artizancoffee.com",
+   "macys.com",
+   "fellowproducts.com",
+   "couleecoffee.com",
+   "wonderstate.com",
+   "williams-sonoma.com",
+   "crateandbarrel.com",
+   "surlatable.com",
+   "seattlecoffeegear.com",
+   "prima-coffee.com",
+   "clivecoffee.com",
+   "brewmethods.com",
+   "coffeeproject.com"
+  ],
+  "stores_skipped": [
+   "walmart.com (marketplace: Marketplace and retailer for home appliances.)",
+   "amazon.com (marketplace: Marketplace with many kettle sellers.)",
+   "cocinare.com (brand_shop: Cocinare’s own kettle brand, not Fellow.)",
+   "thewaytocoffee.com (media_or_review: Coffee gear review and guide site.)",
+   "shop.greatergoods.com (brand_shop: Greater Goods’ own kettle brand, not Fellow.)",
+   "hazelquinn.com (brand_shop: Own-brand kettle shop, not Fellow.)",
+   "coffeechronicler.com (media_or_review: Coffee gear review and advice site.)",
+   "smilingcoffeesnob.com (media_or_review: Coffee gear blog and review site.)",
+   "reddit.com (not_a_shop: Discussion forum, not a store.)",
+   "thegingerbreadmansion.com (not_a_shop: Hospitality business website, not a kettle shop.)"
+  ],
+  "attempts": 1,
+  "search_errors": [],
+  "screened": 14,
+  "screen_kept": 5,
+  "verify_rejected": [
+   {
+    "store": "fellowproducts.com",
+    "url": "https://fellowproducts.com/products/stagg-ekg-electric-pour-over-kettle",
+    "reason": "The other listing’s page title includes “Pro” and “Pro Studio,” edition markers absent from your listing."
+   }
+  ],
+  "proposals": [
+   {
+    "store": "formandfunctioncoffee.com",
+    "url": "https://formandfunctioncoffee.com/shop/fellow-stagg-ekg-electric-kettle/",
+    "title": "Fellow Stagg EKG Electric Kettle – Form & Function",
+    "price": 169.95,
+    "currency": "USD",
+    "confidence": 0.94,
+    "reason": "Both listings identify the Fellow Stagg EKG kettle, with no conflicting model or variant details.",
+    "score": "correct"
+   },
+   {
+    "store": "costco.com",
+    "url": "https://www.costco.com/p/-/fellow-stagg-ekg-electric-kettle/4000397413",
+    "title": "Fellow Stagg EKG Electric Kettle",
+    "price": 129.99,
+    "currency": "USD",
+    "confidence": 0.93,
+    "reason": "Both listings identify the Fellow Stagg EKG electric kettle, with no differing model or variant specified.",
+    "score": "correct"
+   },
+   {
+    "store": "palomacoffeebakery.com",
+    "url": "https://palomacoffeebakery.com/products/fellow-stagg-ekg-electric-kettle",
+    "title": "Fellow Stagg EKG Electric Kettle",
+    "price": 165.0,
+    "currency": "USD",
+    "confidence": 0.93,
+    "reason": "Both listings identify the Fellow Stagg EKG electric kettle, with no conflicting model or variant details.",
+    "score": "correct"
+   },
+   {
+    "store": "domacoffee.com",
+    "url": "https://www.domacoffee.com/products/fellow-ekg-kettle",
+    "title": "FELLOW EKG KETTLE",
+    "price": 169.95,
+    "currency": "USD",
+    "confidence": 0.91,
+    "reason": "Both listings are for the Fellow EKG kettle, with no differing model or variant indicated.",
+    "score": "correct"
+   }
+  ],
+  "correct": 4,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 5,
+  "tavily_cached_calls": 0,
+  "llm_cost_usd": 0.0021,
+  "seconds": 50
+ },
+ {
+  "id": "uk-ninja-airfryer",
+  "market": "UK",
+  "niche": "Small appliance, shop SKU instead of the maker's model code",
+  "url": "https://www.euronics.co.uk/catalogue/small-appliances/small-cooking-appliances/air-fryers/ninja-af100uk-38l-air-fryer-and-dehydrator-grey/p/NINAF100UK",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Ninja AF100UK 3.8L Air Fryer and Dehydrator - Grey",
+   "brand": "Ninja",
+   "gtin": null,
+   "mpn": "NINAF100UK",
+   "market": "united kingdom",
+   "price": 99.0,
+   "currency": "GBP"
+  },
+  "queries": [
+   "Ninja AF100UK 3.8L Air Fryer and Dehydrator",
+   "Ninja AF100UK air fryer grey buy UK",
+   "Ninja AF100UK grey 3.8L air fryer buy UK",
+   "NINAF100UK Ninja air fryer retailer",
+   "Ninja AF100UK air fryer and dehydrator price UK"
+  ],
+  "market_queries": [
+   "air fryer buy UK",
+   "air fryer shop UK"
+  ],
+  "retailers": [
+   "johnlewis.com",
+   "currys.co.uk",
+   "argos.co.uk",
+   "very.co.uk",
+   "ao.com",
+   "robertdyas.co.uk",
+   "lakeland.co.uk",
+   "ninjakitchen.co.uk",
+   "direct.asda.com",
+   "sharkninja.com",
+   "appliancesdirect.co.uk",
+   "hughes.co.uk",
+   "sonicdirect.co.uk",
+   "hartsstore.com",
+   "donaghybros.co.uk",
+   "electricaldiscountuk.co.uk",
+   "qvcuk.com",
+   "littlewoods.com"
+  ],
+  "stores_skipped": [
+   "reddit.com (not_a_shop: Discussion forum, not a retailer.)",
+   "which.co.uk (media_or_review: Product testing and buying advice.)",
+   "goodhousekeeping.com (media_or_review: Publishes air fryer reviews.)",
+   "youtube.com (unknown: No verdict from the model.)",
+   "cosori.co.uk (brand_shop: COSORI's own shop sells its own brand.)",
+   "instantpot.co.uk (brand_shop: Instant Pot's own shop sells its own brand.)",
+   "bbcgoodfood.com (media_or_review: Food publication with product reviews.)",
+   "saga.co.uk (media_or_review: Editorial buying advice, not an air fryer shop.)",
+   "mumsnet.com (media_or_review: Parenting site with product reviews.)",
+   "telegraph.co.uk (media_or_review: Publishes air fryer reviews.)",
+   "theguardian.com (media_or_review: Publishes product recommendations.)",
+   "amazon.co.uk (marketplace: Marketplace with many third-party sellers.)",
+   "idealhome.co.uk (media_or_review: Home and product review publication.)",
+   "techradar.com (media_or_review: Technology publication with product reviews.)",
+   "shop.tefal.co.uk (brand_shop: Tefal's own shop sells its own brand.)",
+   "midea.com (brand_shop: Midea brand site, not a Ninja retailer.)",
+   "hamiltonbeach.co.uk (brand_shop: Hamilton Beach’s own-brand shop; sells its own air fryers.)",
+   "cosori.co.uk (brand_shop: COSORI’s own-brand shop; sells COSORI air fryers.)",
+   "store.eu.panasonic.com (brand_shop: Panasonic’s own-brand shop; sells Panasonic appliances.)",
+   "amazon.co.uk (marketplace: Marketplace with many sellers and air fryer listings.)",
+   "sharkninjasa.com (brand_shop: Ninja brand shop serving Saudi Arabia, not the UK market.)",
+   "instantpot.co.uk (brand_shop: Instant Pot’s own-brand shop; sells its own air fryers.)",
+   "bbcgoodfood.com (media_or_review: Food magazine and product review site.)",
+   "goodhousekeeping.com (media_or_review: Product-testing and review publication.)",
+   "mumsnet.com (media_or_review: Parenting community with product guides and reviews.)",
+   "salter.com (brand_shop: Salter’s own-brand shop; sells Salter air fryers.)",
+   "midea.com (brand_shop: Midea’s own-brand site; sells Midea appliances.)",
+   "youtube.com (media_or_review: Video-sharing platform, not a product shop.)",
+   "reddit.com (not_a_shop: Discussion forum, not a product retailer.)",
+   "which.co.uk (media_or_review: Product testing and buying advice site.)",
+   "shop.tefal.co.uk (brand_shop: Tefal’s own-brand shop; sells Tefal air fryers.)",
+   "fromourplace.co.uk (brand_shop: Our Place’s own-brand shop; sells its own oven products.)",
+   "tefal.co.uk (brand_shop: Tefal’s own-brand shop; sells Tefal products.)",
+   "marks-electrical.co.uk (unknown: Suggested by the model, but the domain does not exist.)"
+  ],
+  "attempts": 2,
+  "search_errors": [],
+  "screened": 34,
+  "screen_kept": 12,
+  "verify_rejected": [
+   {
+    "store": "amazon.co.uk",
+    "url": "https://www.amazon.co.uk/Ninja-AF100UK-Fryer-Plastic-liters/dp/B07PBBW4XF",
+    "reason": "No price found on the page."
+   },
+   {
+    "store": "robertdyas.co.uk",
+    "url": "https://www.robertdyas.co.uk/ninja-af100uk-3-8l-air-fryer-45-grey",
+    "reason": "No price found on the page."
+   },
+   {
+    "store": "johnlewis.com",
+    "url": "https://www.johnlewis.com/ninja-af100uk-air-fryer-grey/p4846470",
+    "reason": "No price found on the page."
+   },
+   {
+    "store": "appliancesdirect.co.uk",
+    "url": "https://www.appliancesdirect.co.uk/p/af100uk/ninja-af100uk-air-fryers-fryer",
+    "reason": "Page not found (HTTP 410) — the product may have been removed."
+   },
+   {
+    "store": "qvcuk.com",
+    "url": "https://www.qvcuk.com/product.811503.html?bvstate=pg%3A13%2Fct%3Ar",
+    "reason": "This doesn't look like a single product page."
+   },
+   {
+    "store": "direct.asda.com",
+    "url": "https://direct.asda.com/george/electricals/kitchen-appliances/air-fryers/ninja-air-fryer-38-litre-af100uk/060121261,default,pd.html",
+    "reason": "No price found on the page."
+   },
+   {
+    "store": "donaghybros.co.uk",
+    "url": "https://donaghybros.co.uk/ninja-af100uk-air-fryer-black.html",
+    "reason": "No price found on the page."
+   }
+  ],
+  "proposals": [
+   {
+    "store": "thewashhouse.com",
+    "url": "https://www.thewashhouse.com/ninja/ninja-af100uk-grey-200112629.html",
+    "title": "Ninja AF100UK 3.8L Air Fryer And Dehydrator - Grey",
+    "price": 99.0,
+    "currency": "GBP",
+    "confidence": 0.99,
+    "reason": "The model AF100UK, 3.8L capacity, and grey color match exactly.",
+    "score": "correct"
+   },
+   {
+    "store": "combensapps.co.uk",
+    "url": "https://www.combensapps.co.uk/ninja-af100uk-grey-100002708.html",
+    "title": "Ninja AF100UK 3.8L Air Fryer And Dehydrator",
+    "price": 99.99,
+    "currency": "GBP",
+    "confidence": 0.99,
+    "reason": "Both listings identify the Ninja AF100UK 3.8L Air Fryer and Dehydrator, with no variant differences indicated.",
+    "score": "correct"
+   },
+   {
+    "store": "littlewoods.com",
+    "url": "https://www.littlewoods.com/ninja-air-fryer-af100uk/1600348148.prd?bvstate=pg%3A31%2Fct%3Ar",
+    "title": "NINJA 4-in-1 3.8 Litre Single Basket Air Fryer AF100UK",
+    "price": 134.99,
+    "currency": "GBP",
+    "confidence": 0.94,
+    "reason": "Both listings identify the Ninja AF100UK 3.8L single-basket air fryer; the differing MPN appears to be a retailer or catalog code.",
+    "score": "correct"
+   }
+  ],
+  "correct": 3,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 11,
+  "tavily_cached_calls": 7,
+  "llm_cost_usd": 0.0077,
+  "seconds": 95
+ },
+ {
+  "id": "uk-helen-round-towel",
+  "market": "UK",
+  "niche": "Small designer brand without EAN, sold by gift shops",
+  "url": "https://countrylivingshop.co.uk/products/winter-fox-linen-tea-towel",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Winter Fox Linen Tea Towel",
+   "brand": "Helen Round",
+   "gtin": null,
+   "mpn": null,
+   "market": "united kingdom",
+   "price": 18.0,
+   "currency": "GBP"
+  },
+  "queries": [
+   "Helen Round Winter Fox Linen Tea Towel",
+   "\"Winter Fox\" \"Helen Round\" tea towel",
+   "Helen Round linen tea towel"
+  ],
+  "market_queries": [
+   "linen tea towels buy UK"
+  ],
+  "retailers": [
+   "helenround.com",
+   "willowandstone.co.uk",
+   "home-landing.co.uk",
+   "countrysideart.co.uk",
+   "woodsfinelinens.com",
+   "johnlewis.com",
+   "fenwick.co.uk",
+   "amara.com",
+   "thelinenworks.co.uk",
+   "cuckooland.com",
+   "dotcomgiftshop.com",
+   "oliverbonas.com"
+  ],
+  "stores_skipped": [
+   "ebay.co.uk (marketplace: Marketplace with many third-party sellers.)",
+   "givans.co.uk (brand_shop: Own kitchen-linen range; not Helen Round.)",
+   "pigletinbed.com (brand_shop: Own home-linen brand and range.)",
+   "facebook.com (not_a_shop: Social platform, not a product shop.)",
+   "linenme.com (brand_shop: Own linen brand and products.)",
+   "ulsterweavers.com (brand_shop: Own tea-towel brand.)",
+   "le-jacquard-francais.com (brand_shop: Own French kitchen-linen brand.)",
+   "amazon.co.uk (marketplace: Marketplace with many third-party sellers.)",
+   "fergusonsirishlinen.com (brand_shop: Own Irish-linen products.)",
+   "breadtopia.com (online_shop: Baking-focused shop, not a likely stockist.)",
+   "jwanderson.com (brand_shop: Own fashion and home-goods brand.)",
+   "etsy.com (marketplace: Marketplace with independent sellers.)",
+   "purenewhome.com (unknown: Suggested by the model, but the domain does not exist.)"
+  ],
+  "attempts": 1,
+  "search_errors": [],
+  "screened": 9,
+  "screen_kept": 2,
+  "verify_rejected": [],
+  "proposals": [
+   {
+    "store": "helenround.com",
+    "url": "https://www.helenround.com/products/winter-fox-collection-linen-tea-towel",
+    "title": "Winter Fox Linen Tea Towel",
+    "price": 18.0,
+    "currency": "GBP",
+    "confidence": 0.98,
+    "reason": "Both listings name the Winter Fox Linen Tea Towel, and no differing variant or condition is indicated.",
+    "score": "correct"
+   },
+   {
+    "store": "notonthehighstreet.com",
+    "url": "https://www.notonthehighstreet.com/helenround/product/winter-fox-linen-tea-towel",
+    "title": "Winter Fox Linen Tea Towel",
+    "price": 18.0,
+    "currency": "GBP",
+    "confidence": 0.97,
+    "reason": "Both listings identify the same Winter Fox Linen Tea Towel by Helen Round, with no differing variant or edition markers.",
+    "score": "correct"
+   }
+  ],
+  "correct": 2,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 2,
+  "tavily_cached_calls": 3,
+  "llm_cost_usd": 0.0013,
+  "seconds": 31
+ },
+ {
+  "id": "uk-lakeland-tin",
+  "market": "UK",
+  "niche": "Shop's own brand (negative control)",
+  "url": "https://www.lakeland.co.uk/products/lakeland-brownie-traybake-tin",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Lakeland Brownie Traybake Tin",
+   "brand": "Lakeland",
+   "gtin": null,
+   "mpn": null,
+   "market": "united kingdom",
+   "price": 9.99,
+   "currency": "GBP"
+  },
+  "queries": [
+   "\"Lakeland Brownie Traybake Tin\"",
+   "Lakeland Brownie Traybake Baking Tin buy",
+   "Lakeland brownie traybake tin retailer",
+   "Lakeland brownie traybake tin 23 x 33 cm buy UK",
+   "Lakeland brownie baking tin traybake stockist",
+   "\"Lakeland Brownie Traybake\" tin shop"
+  ],
+  "market_queries": [
+   "brownie traybake tin buy",
+   "brownie baking tin buy UK"
+  ],
+  "retailers": [
+   "dilektable.com",
+   "boroughkitchen.com",
+   "thebigkitchen.co.uk",
+   "pmecake.com",
+   "johnlewis.com",
+   "dunelm.com",
+   "robertdyas.co.uk",
+   "argos.co.uk",
+   "hobbycraft.co.uk",
+   "souschef.co.uk",
+   "nisbets.co.uk",
+   "buymeonce.co.uk",
+   "thecakedecoratingcompany.co.uk",
+   "sugarcraftshop.co.uk",
+   "infusions4chefs.co.uk",
+   "sugarandicecake.co.uk",
+   "japaneseknifecompany.com",
+   "bakerybits.co.uk",
+   "cakecraftworld.co.uk",
+   "cake-stuff.com",
+   "thecookskitchen.com",
+   "divertimenti.co.uk"
+  ],
+  "stores_skipped": [
+   "olivemagazine.com (media_or_review: Food magazine and product reviews)",
+   "procook.co.uk (brand_shop: ProCook’s own cookware brand shop)",
+   "silverwoodbakewareusa.com (brand_shop: Silverwood brand shop serving the US)",
+   "ebay.com (marketplace: Marketplace sellers can list Lakeland bakeware)",
+   "silverwood-bakeware.com (brand_shop: Silverwood’s own bakeware shop)",
+   "amazon.com (marketplace: Marketplace sellers can list products from other brands)",
+   "etsy.com (marketplace: Marketplace sellers can list baking tins)",
+   "facebook.com (not_a_shop: Social media post, not a shop)",
+   "scientificallysweet.com (media_or_review: Recipe and baking advice site)",
+   "reddit.com (media_or_review: Discussion forum, not a shop)",
+   "krollskorner.com (media_or_review: Recipe and baking blog)",
+   "sallysbakingaddiction.com (media_or_review: Recipe and baking blog)",
+   "youtube.com (media_or_review: Video platform, not a shop)",
+   "u-buy.co.uk (marketplace: Marketplace selling baking tins from multiple sellers.)",
+   "olivemagazine.com (media_or_review: Food magazine with product reviews.)",
+   "nigella.com (media_or_review: Cooking advice and recipe website.)",
+   "amazon.co.uk (marketplace: Marketplace with many sellers and baking tins.)",
+   "ebay.co.uk (marketplace: Marketplace with many sellers and baking tins.)",
+   "silverwood-bakeware.com (brand_shop: Silverwood's own bakeware shop, not Lakeland stock.)",
+   "etsy.com (marketplace: Marketplace with independent baking sellers.)",
+   "talacooking.com (brand_shop: Tala's own-brand shop, not Lakeland stock.)",
+   "lecreuset.co.uk (brand_shop: Le Creuset's own-brand shop, not Lakeland stock.)",
+   "instagram.com (not_a_shop: Social media platform, not a product shop.)",
+   "tesco.com (marketplace: Retailer with marketplace listings for bakeware.)",
+   "whatsarahbakes.com (media_or_review: Baking blog with recipes and advice.)",
+   "kitchencraft.co.uk (brand_shop: KitchenCraft's own-brand shop, not Lakeland stock.)",
+   "bakerdays.com (online_shop: Custom cake ordering shop, not a bakeware retailer.)",
+   "procook.co.uk (brand_shop: ProCook's own-brand shop, not Lakeland stock.)",
+   "habitat.co.uk (brand_shop: Habitat's own-brand homewares shop, not Lakeland stock.)"
+  ],
+  "attempts": 2,
+  "search_errors": [],
+  "screened": 23,
+  "screen_kept": 0,
+  "verify_rejected": [],
+  "proposals": [],
+  "correct": 0,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 10,
+  "tavily_cached_calls": 0,
+  "llm_cost_usd": 0.0027,
+  "seconds": 76
+ },
+ {
+  "id": "fr-seb-pressure-cooker",
+  "market": "France",
+  "niche": "Cookware, EAN, French-language shop",
+  "url": "https://www.boulanger.com/ref/1230647",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Autocuiseur SEB ClipsoMinut Gourmande 7.5L",
+   "brand": "SEB",
+   "gtin": "3045380402034",
+   "mpn": null,
+   "market": "france",
+   "price": 126.1,
+   "currency": "EUR"
+  },
+  "queries": [
+   "SEB ClipsoMinut Gourmande 7.5L autocuiseur",
+   "3045380402034",
+   "SEB ClipsoMinut Gourmande 7,5 L autocuiseur"
+  ],
+  "market_queries": [
+   "autocuiseur acheter"
+  ],
+  "retailers": [
+   "electrodepot.fr",
+   "darty.com",
+   "mathon.fr",
+   "cuisinstore.com",
+   "seb.fr",
+   "claudiaandjulia.com",
+   "carrefour.fr",
+   "auchan.fr",
+   "ubaldi.com",
+   "cuisineandco.com",
+   "conforama.fr",
+   "leclercdrive.fr"
+  ],
+  "stores_skipped": [
+   "achetezlemeilleur.ca (other_market: A shop for another country (CA).)",
+   "ouest-france.fr (media_or_review: News site with buying guides, not a shop.)",
+   "123comparer.fr (price_comparison: Compares prices and offers from retailers.)",
+   "facebook.com (not_a_shop: Social network, not a product retailer.)",
+   "convicook.com (media_or_review: Informational article about pressure cookers.)",
+   "sitram.fr (brand_shop: Own-brand cookware site; sells Sitram, not SEB.)",
+   "fr.wikipedia.org (not_a_shop: Encyclopedia, not a shop.)",
+   "quechoisir.org (media_or_review: Consumer advice and buying-guide site.)",
+   "idealo.fr (price_comparison: Compares prices and retailer offers.)",
+   "reddit.com (not_a_shop: Discussion forum, not a retailer.)",
+   "blog.but.fr (media_or_review: Retailer blog with advice articles, not a shop page.)",
+   "cristel.com (brand_shop: Own-brand cookware site; sells Cristel, not SEB.)",
+   "femmeactuelle.fr (media_or_review: Magazine with product comparisons, not a shop.)",
+   "fnac.com (marketplace: French retailer and marketplace with home-appliance sellers.)",
+   "lalibrairie.com (online_shop: Book retailer, not a cookware seller.)"
+  ],
+  "attempts": 1,
+  "search_errors": [],
+  "screened": 17,
+  "screen_kept": 7,
+  "verify_rejected": [
+   {
+    "store": "but.fr",
+    "url": "https://www.but.fr/produits/3045380402034/Cocotte-Minute-7-5l-Acier-Inoxydable-P4624877.html",
+    "reason": "Couldn't load the page: HTTP 403; the backup reader (Tavily) was blocked too."
+   },
+   {
+    "store": "brico-travo.com",
+    "url": "https://brico-travo.com/hammel/460156-clipso-minutgourmande-7l5---gpe-seb-france-menage-3045380402034.html",
+    "reason": "Page not found (HTTP 404) — the product may have been removed."
+   },
+   {
+    "store": "carrefour.fr",
+    "url": "https://www.carrefour.fr/p/cocotte-minute-7-5l-acier-inoxydable-seb-p4624877-3045380402034",
+    "reason": "The AI-read price could not be verified against the page text."
+   }
+  ],
+  "proposals": [
+   {
+    "store": "e.leclerc",
+    "url": "https://www.e.leclerc/fp/cocotte-minute-7-5l-acier-inoxydable-p4624877-seb-3045380402034",
+    "title": "Cocotte minute 7.5l acier inoxydable  - P4624877 - Seb",
+    "price": 110.0,
+    "currency": "EUR",
+    "confidence": 0.99,
+    "reason": "Same EAN/GTIN code on both pages.",
+    "score": "correct"
+   },
+   {
+    "store": "fnac.com",
+    "url": "https://www.fnac.com/SEB-Cocotte-minute-7-5L-ClipsoMinut-Gourmande-P4624877/a22046556/w-4",
+    "title": "SEB Cocotte-minute 7,5L ClipsoMinut'' Gourmande P4624877",
+    "price": 110.0,
+    "currency": "EUR",
+    "confidence": 0.99,
+    "reason": "Same EAN/GTIN code on both pages.",
+    "score": "correct"
+   },
+   {
+    "store": "auchan.fr",
+    "url": "https://www.auchan.fr/seb-autocuiseur-clipsominut-gourmande-7-5l/pr-296ef128-ec5d-4f2d-9411-b55483301a80",
+    "title": "Autocuiseur ClipsoMinut Gourmande 7.5L",
+    "price": 126.1,
+    "currency": "EUR",
+    "confidence": 0.96,
+    "reason": "Both listings identify the same SEB ClipsoMinut Gourmande 7.5L pressure cooker, with no differing variant markers.",
+    "score": "correct"
+   },
+   {
+    "store": "showroomprive.com",
+    "url": "https://www.showroomprive.com/market/catalog/productp.aspx?produit=m-10691928",
+    "title": "Autocuiseur SEB ClipsoMinut Gourmande 7.5L",
+    "price": 117.51,
+    "currency": "EUR",
+    "confidence": 0.83,
+    "reason": "Both listings identify the SEB ClipsoMinut Gourmande 7.5L autocooker with matching model and capacity.",
+    "score": "correct"
+   }
+  ],
+  "correct": 4,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 2,
+  "tavily_cached_calls": 5,
+  "llm_cost_usd": 0.0025,
+  "seconds": 36
+ },
+ {
+  "id": "fr-ordinary-serum",
+  "market": "France",
+  "niche": "Cosmetics in an online pharmacy, EAN",
+  "url": "https://www.redcare-pharmacie.fr/beaute/BE04657888/the-ordinary-niacinamide-10-zinc-1.htm",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "THE ORDINARY Niacinamide 10% + Zinc 1%",
+   "brand": "The Ordinary.",
+   "gtin": "0769915195941",
+   "mpn": "BE003370",
+   "market": "france",
+   "price": 5.69,
+   "currency": "EUR"
+  },
+  "queries": [
+   "The Ordinary Niacinamide 10% + Zinc 1% 30 ml acheter",
+   "0769915195941",
+   "The Ordinary Niacinamide 10% Zinc 1% 30 ml France",
+   "\"The Ordinary\" \"Niacinamide 10% + Zinc 1%\" 30 ml France acheter",
+   "\"Niacinamide 10% + Zinc 1%\" \"The Ordinary\" site:pharmacie*.fr",
+   "\"769915195941\" sérum niacinamide"
+  ],
+  "market_queries": [
+   "sérum niacinamide zinc acheter en ligne",
+   "sérum niacinamide The Ordinary acheter"
+  ],
+  "retailers": [
+   "nocibe.fr",
+   "boticinal.com",
+   "theordinary.com",
+   "lookfantastic.fr",
+   "stylevana.com",
+   "pharmaciepolygone.com",
+   "paraplus.fr",
+   "sephora.fr",
+   "notino.fr",
+   "marionnaud.fr",
+   "easypara.fr",
+   "cocooncenter.com",
+   "pharmaciedesdrakkars.com",
+   "ohmycream.com",
+   "pharmacie-forum-halles-paris.com",
+   "galaxus.fr",
+   "paraclik.com",
+   "bleulibellule.com",
+   "beautybay.com",
+   "douglas.fr",
+   "beautycoiffure.com",
+   "pharma-gdd.com",
+   "pharmacie-prado-mermoz.com",
+   "lasante.net"
+  ],
+  "stores_skipped": [
+   "iciparisxl.be (other_market: A shop for another country (BE).)",
+   "ecco-verde.be (other_market: A shop for another country (BE).)",
+   "sephora.ch (other_market: A shop for another country (CH).)",
+   "douglas.ch (other_market: A shop for another country (CH).)",
+   "idealo.fr (price_comparison: Compares prices and merchants; does not stock products.)",
+   "20minutes.fr (media_or_review: News and editorial site, not a product shop.)",
+   "touchelab.com (unknown: No verdict from the model.)",
+   "fr.shopping.rakuten.com (marketplace: Marketplace with third-party sellers offering skincare.)",
+   "bfmtv.com (media_or_review: News and shopping-content publisher, not a product shop.)",
+   "quechoisir.org (media_or_review: Consumer information and product-testing site.)",
+   "beautymarket.ma (other_market: Moroccan beauty retailer; sells cosmetics including this product type.)",
+   "facebook.com (not_a_shop: Social network page, not a dedicated product shop.)",
+   "djeddi-pharmacie-dz.com (other_market: Algerian pharmacy shop listing this exact product.)",
+   "pharmacie-lafayette.com (unknown: Suggested by the model, but the domain does not exist.)",
+   "zalando.lu (other_market: A shop for another country (LU).)",
+   "iciparisxl.be (other_market: A shop for another country (BE).)",
+   "well.ca (other_market: A shop for another country (CA).)",
+   "rinascente.it (other_market: A shop for another country (IT).)",
+   "ouest-france.fr (media_or_review: News publisher, not a shop.)",
+   "klarna.com (price_comparison: Compares prices from retailers.)",
+   "bonniegarner.com (media_or_review: Beauty blog and product review.)",
+   "tourdumonde5continents.com (media_or_review: Personal product-review blog.)",
+   "amazon.fr (marketplace: Marketplace with beauty-product sellers.)",
+   "lefigaro.fr (media_or_review: News and editorial content.)",
+   "idealo.fr (price_comparison: Compares prices from online retailers.)",
+   "bfmtv.com (media_or_review: News publisher, not a shop.)",
+   "instagram.com (not_a_shop: Social network, not a retailer.)",
+   "facebook.com (not_a_shop: Social network, not a retailer.)",
+   "youtube.com (media_or_review: Video platform, not a shop.)",
+   "sephora.com (other_market: Beauty retailer serving markets outside France; lists this serum.)",
+   "incibeauty.com (media_or_review: Ingredient information and community site.)",
+   "pharmacieeiffel.com (unknown: Suggested by the model, but the domain does not exist.)",
+   "pharmacie-lafayette.com (unknown: Suggested by the model, but the domain does not exist.)",
+   "pharmacie-de-saxe.com (unknown: Suggested by the model, but the domain does not exist.)"
+  ],
+  "attempts": 2,
+  "search_errors": [],
+  "screened": 40,
+  "screen_kept": 8,
+  "verify_rejected": [
+   {
+    "store": "sephora.fr",
+    "url": "https://www.sephora.fr/p/niacinamide-10%25-zinc-1%25---serum-anti-imperfections-P3921091.html",
+    "reason": "Couldn't load the page: HTTP 403; the backup reader (Tavily) was blocked too."
+   },
+   {
+    "store": "nocibe.fr",
+    "url": "https://www.nocibe.fr/fr/p/3001043628",
+    "reason": "No price found on the page."
+   },
+   {
+    "store": "paraclik.com",
+    "url": "https://paraclik.com/produit/ordinary-niacinamide-10-zinc-1-30-ml",
+    "reason": "Sells in DZD, outside your market (EUR)."
+   },
+   {
+    "store": "beautybay.com",
+    "url": "https://www.beautybay.com/p/the-ordinary/niacinamide-10-zinc-1/niacinamide-10-zinc-1",
+    "reason": "Sells in USD, outside your market (EUR)."
+   }
+  ],
+  "proposals": [
+   {
+    "store": "pharmacie-forum-halles-paris.com",
+    "url": "https://www.pharmacie-forum-halles-paris.com/the-ordinary-niacinamide-10-zinc-1-30ml-p51129",
+    "title": "THE ORDINARY - Niacinamide 10% + zinc 1% 30ml",
+    "price": 6.0,
+    "currency": "EUR",
+    "confidence": 0.99,
+    "reason": "Both listings are The Ordinary Niacinamide 10% + Zinc 1% in the 30 ml size.",
+    "score": "correct"
+   },
+   {
+    "store": "pharma-gdd.com",
+    "url": "https://www.pharma-gdd.com/fr/the-ordinary-serum-niacinamide-10-zinc-1",
+    "title": "The Ordinary Sérum Niacinamide 10% + Zinc 1%",
+    "price": 5.99,
+    "currency": "EUR",
+    "confidence": 0.99,
+    "reason": "Same EAN/GTIN code on both pages.",
+    "score": "correct"
+   },
+   {
+    "store": "theordinary.com",
+    "url": "https://theordinary.com/fr-fr/niacinamide-10-zinc-1-serum-100436.html",
+    "title": "Niacinamide 10% + Zinc 1%",
+    "price": 6.0,
+    "currency": "EUR",
+    "confidence": 0.96,
+    "reason": "Both listings identify The Ordinary Niacinamide 10% + Zinc 1% in the same 30 ml size; no variant difference is indicated.",
+    "score": "correct"
+   }
+  ],
+  "correct": 3,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 8,
+  "tavily_cached_calls": 5,
+  "llm_cost_usd": 0.0045,
+  "seconds": 88
+ },
+ {
+  "id": "nl-philips-airfryer",
+  "market": "Netherlands",
+  "niche": "Appliance, no EAN in the page data, possibly discontinued",
+  "url": "https://www.coolblue.nl/en/product/878234/philips-airfryer-l-hd9252-70.html",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Philips Airfryer L HD9252/70",
+   "brand": "Philips",
+   "gtin": null,
+   "mpn": null,
+   "market": "netherlands",
+   "price": 99.0,
+   "currency": "EUR"
+  },
+  "queries": [
+   "Philips Airfryer L HD9252/70 kopen",
+   "Philips HD9252/70 airfryer",
+   "\"HD9252/70\" Philips airfryer",
+   "\"HD9252 70\" Philips Airfryer L",
+   "Philips HD9252/70 airfryer kopen Nederland"
+  ],
+  "market_queries": [
+   "airfryer kopen",
+   "airfryer kopen"
+  ],
+  "retailers": [
+   "mediamarkt.nl",
+   "expert.nl",
+   "wehkamp.nl",
+   "blokker.nl",
+   "bcc.nl",
+   "fonq.nl",
+   "alternate.nl",
+   "boxxer.nl",
+   "ep.nl",
+   "electroworld.nl",
+   "debijenkorf.nl",
+   "makro.nl",
+   "voordeelshop.nl",
+   "philips.nl",
+   "kijkshop.nl"
+  ],
+  "stores_skipped": [
+   "bol.com (marketplace: Marketplace with appliance sellers and Philips products.)",
+   "amazon.nl (marketplace: Marketplace with many sellers and Philips products.)",
+   "eldi.be (other_market: A shop for another country (BE).)",
+   "coolblue.be (other_market: A shop for another country (BE).)",
+   "mediamarkt.be (other_market: A shop for another country (BE).)",
+   "vandenborre.be (other_market: A shop for another country (BE).)",
+   "test-aankoop.be (other_market: A shop for another country (BE).)",
+   "us.home-appliances.philips (other_market: A shop for another country (US).)",
+   "knibble.nl (price_comparison: Compares prices rather than selling products.)",
+   "puurmieke.nl (online_shop: Sells a narrow range of natural-living products and other-brand air fryers.)",
+   "consumentenbond.nl (media_or_review: Consumer advice and product reviews.)",
+   "joybuy.nl (marketplace: Broad online marketplace with a wide product range.)",
+   "kitchenbrothers.nl (brand_shop: Own-brand air fryers, not Philips products.)",
+   "lekkerplan.nl (media_or_review: Air fryer buying guides and recommendations.)",
+   "margriet.nl (media_or_review: Lifestyle magazine with buying advice.)",
+   "wonenmetlef.nl (media_or_review: Home and lifestyle buying guides.)",
+   "youtube.com (media_or_review: Video platform, not a product shop.)",
+   "sharkninja.nl (brand_shop: Official SharkNinja shop selling its own competing brand.)",
+   "kieskeurig.nl (price_comparison: Product comparison and price-search site.)",
+   "reddit.com (media_or_review: Discussion forum, not a product shop.)",
+   "bol.com (marketplace: Dutch marketplace with many sellers and electronics listings.)",
+   "handyman.nl (online_shop: Focuses on appliance parts and accessories, not air fryers.)"
+  ],
+  "attempts": 2,
+  "search_errors": [],
+  "screened": 29,
+  "screen_kept": 2,
+  "verify_rejected": [
+   {
+    "store": "airfryerkopen.nl",
+    "url": "https://www.airfryerkopen.nl/philips-airfryer-l-hd9252-70",
+    "reason": "No price found on the page."
+   },
+   {
+    "store": "piest.nl",
+    "url": "https://www.piest.nl/keuken/bakken-braden-grillen/airfryers",
+    "reason": "This doesn't look like a single product page."
+   }
+  ],
+  "proposals": [],
+  "correct": 0,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 8,
+  "tavily_cached_calls": 4,
+  "llm_cost_usd": 0.0039,
+  "seconds": 61
+ },
+ {
+  "id": "pl-logitech-mouse",
+  "market": "Poland",
+  "niche": "Electronics, EAN, currency PLN",
+  "url": "https://mediamarkt.pl/pl/product/_mysz-logitech-mx-master-3s-bluetooth-edition-grafitowy-1497571.html",
+  "status": "completed",
+  "error": null,
+  "product": {
+   "name": "Mysz LOGITECH MX Master 3S \"SE\" Bluetooth Edition Grafitowy",
+   "brand": "LOGITECH",
+   "gtin": "5099206129382",
+   "mpn": null,
+   "market": "poland",
+   "price": 319.99,
+   "currency": "PLN"
+  },
+  "queries": [
+   "Logitech MX Master 3S SE Bluetooth Edition grafitowy",
+   "5099206129382",
+   "Logitech MX Master 3S SE mysz grafitowa",
+   "Logitech 910-006559 MX Master 3S Bluetooth Edition graphite sklep Polska",
+   "Logitech MX Master 3S grafitowa 910-006559",
+   "5099206129382 Logitech mysz sklep Polska"
+  ],
+  "market_queries": [
+   "mysz Logitech MX Master 3S kup",
+   "mysz ergonomiczna bezprzewodowa kup online"
+  ],
+  "retailers": [
+   "lenovo24.pl",
+   "sferis.pl",
+   "komputronik.pl",
+   "itnes.pl",
+   "euro.com.pl",
+   "mediaexpert.pl",
+   "morele.net",
+   "supertech.pl",
+   "x-kom.pl",
+   "logitech.com",
+   "oleole.pl",
+   "proshop.pl",
+   "avans.pl",
+   "vobis.pl",
+   "bechtle.com",
+   "kupcochcesz.pl",
+   "shoplet.pl",
+   "drukarki.pl",
+   "neonet.pl",
+   "proline.pl",
+   "al.to",
+   "senetic.pl",
+   "delkom.pl",
+   "matrixmedia.pl",
+   "notebooki.pl",
+   "amso.pl",
+   "balta.pl",
+   "1.pl"
+  ],
+  "stores_skipped": [
+   "arena.pl (marketplace: Marketplace listing Logitech MX Master 3S.)",
+   "allegro.pl (marketplace: Marketplace listing the Bluetooth Edition model.)",
+   "ceneo.pl (price_comparison: Compares prices and links to retailers.)",
+   "e-katalog.pl (price_comparison: Catalog and price-comparison site.)",
+   "zlozone.net (media_or_review: Product review article, not a shop.)",
+   "geex.x-kom.pl (media_or_review: Technology review site.)",
+   "dell24.pl (brand_shop: Dell-focused shop; not the Logitech brand store.)",
+   "hppartner.pl (brand_shop: HP-focused shop; not the Logitech brand store.)",
+   "reddit.com (not_a_shop: Discussion forum, not a retailer.)",
+   "skapiec.pl (price_comparison: Compares product prices across shops.)",
+   "rtveuroagd.pl (unknown: Suggested by the model, but the domain does not exist.)",
+   "hama.com (brand_shop: Hama’s own-brand shop; not Logitech stock.)",
+   "ceneo.pl (price_comparison: Price-comparison site listing offers from retailers.)",
+   "allegro.pl (marketplace: Marketplace with many sellers and computer accessories.)",
+   "store.acer.com (brand_shop: Acer’s own-brand shop; not Logitech stock.)",
+   "pl.banggood.com (marketplace: Broad online marketplace with products from many sellers.)",
+   "trust.com (brand_shop: Trust’s own-brand shop; not Logitech stock.)",
+   "zenwire.eu (brand_shop: Zenwire’s own-brand shop; not Logitech stock.)",
+   "skapiec.pl (price_comparison: Price-comparison site for products sold by retailers.)",
+   "forum.benchmark.pl (media_or_review: Technology discussion forum, not a shop.)",
+   "empik.com (marketplace: Polish retailer and marketplace with electronics listings.)",
+   "youtube.com (media_or_review: Video and review platform, not a shop.)",
+   "3dconnexion.com (brand_shop: 3Dconnexion’s own-brand shop; not Logitech stock.)",
+   "gry-online.pl (media_or_review: Gaming media site, not a shop.)"
+  ],
+  "attempts": 2,
+  "search_errors": [],
+  "screened": 46,
+  "screen_kept": 6,
+  "verify_rejected": [
+   {
+    "store": "mediaexpert.pl",
+    "url": "https://www.mediaexpert.pl/komputery-i-tablety/myszy-komputerowe/myszki-uniwersalne/mysz-logitech-mx-master-3s-se-grafitowy",
+    "reason": "This doesn't look like a single product page."
+   },
+   {
+    "store": "euro.com.pl",
+    "url": "https://www.euro.com.pl/myszy/logitech-mysz-mx-master-3s-se-graphite.bhtml",
+    "reason": "No price found on the page."
+   },
+   {
+    "store": "x-kom.pl",
+    "url": "https://www.x-kom.pl/p/1365777-myszka-bezprzewodowa-logitech-mx-master-3s-edition-bluetooth.html",
+    "reason": "Couldn't load the page: HTTP 403; the backup reader (Tavily) was blocked too."
+   },
+   {
+    "store": "al.to",
+    "url": "https://www.al.to/p/1365777-myszka-bezprzewodowa-logitech-mx-master-3s-edition-bluetooth.html",
+    "reason": "No price found on the page."
+   }
+  ],
+  "proposals": [
+   {
+    "store": "komputronik.pl",
+    "url": "https://www.komputronik.pl/product/984087/myszka-logitech-mx-master-3s-se-grafitowy.html",
+    "title": "Myszka Logitech MX Master 3s SE bezprzewodowa szara",
+    "price": 340.0,
+    "currency": "PLN",
+    "confidence": 0.99,
+    "reason": "Same EAN/GTIN code on both pages.",
+    "score": "correct"
+   },
+   {
+    "store": "senetic.pl",
+    "url": "https://www.senetic.pl/product/910-007501",
+    "title": "Logitech 910-007501 MX Master 3S Mysz bezprzewodowa Bluetooth grafitowa",
+    "price": 305.7,
+    "currency": "PLN",
+    "confidence": 0.99,
+    "reason": "Same EAN/GTIN code on both pages.",
+    "score": "correct"
+   }
+  ],
+  "correct": 2,
+  "wrong": 0,
+  "unlabeled": 0,
+  "tavily_credits": 6,
+  "tavily_cached_calls": 8,
+  "llm_cost_usd": 0.005,
+  "seconds": 83
+ }
+]

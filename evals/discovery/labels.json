@@ -1,0 +1,151 @@
+{
+ "https://shop.harmonsgrocery.com/store/harmons/products/169296-lodge-cast-iron-10-25-cast-iron-skillet-1-ea": {
+  "correct": true,
+  "note": "Lodge 10.25in skillet = L8SK3"
+ },
+ "https://www.costco.com/p/-/hoka-mens-clifton-10-shoe/4000377854": {
+  "correct": true,
+  "note": "men's Clifton 10, page offers several colourways"
+ },
+ "https://www.fleetfeet.com/products/mens-hoka-clifton-10": {
+  "correct": true,
+  "note": "men's Clifton 10, page offers several colourways"
+ },
+ "https://www.familyfootwearcenter.com/hoka-1162030-clifton-10-running-shoes-oatmeal-oat-milk": {
+  "correct": false,
+  "note": "Oatmeal/Oat Milk colourway; ours is Raw Linen/Stone"
+ },
+ "https://www.costco.com/p/-/fellow-stagg-ekg-electric-kettle/4000397413": {
+  "correct": true,
+  "note": "original Stagg EKG, single kettle"
+ },
+ "https://fellowproducts.com/products/stagg-ekg-electric-pour-over-kettle": {
+  "correct": false,
+  "note": "page sells the EKG Pro / Pro Studio at $199.95"
+ },
+ "https://formandfunctioncoffee.com/shop/fellow-stagg-ekg-electric-kettle/": {
+  "correct": true,
+  "note": "original Stagg EKG"
+ },
+ "https://noelgrimleys.com/p-24018-ninja-af100uk-3-8l-air-fryer-and-dehydrator-grey.aspx": {
+  "correct": true
+ },
+ "https://www.very.co.uk/ninja-4-in-1-38-litre-single-basketnbspair-fryer-af100uk/1600348148.prd": {
+  "correct": true
+ },
+ "https://www.helenround.com/products/winter-fox-collection-linen-tea-towel": {
+  "correct": true,
+  "note": "the maker's own shop"
+ },
+ "https://www.auchan.fr/seb-autocuiseur-clipsominut-gourmande-7-5l/pr-296ef128-ec5d-4f2d-9411-b55483301a80": {
+  "correct": true
+ },
+ "https://www.showroomprive.com/market/catalog/productp.aspx?produit=m-10691928": {
+  "correct": true
+ },
+ "https://theordinary.com/fr-fr/niacinamide-10-zinc-1-serum-100436.html": {
+  "correct": true,
+  "note": "brand's own French shop, 30 ml"
+ },
+ "https://www.bar-b-que.com/lodge-l8sk3-logic-cast-iron-skillet-10-31-in": {
+  "correct": true,
+  "note": "MPN L8SK3"
+ },
+ "https://therunhouse.com/products/men-s-clifton-10-raw-linen-stone": {
+  "correct": true,
+  "note": "same colourway"
+ },
+ "https://shop.rrrc.run/product/5404456/hoka/mens-clifton-10": {
+  "correct": true,
+  "note": "same colourway"
+ },
+ "https://www.roadrunnersports.com/product/47718/mens-hoka-clifton-10": {
+  "correct": true,
+  "note": "men's Clifton 10, page offers several colourways"
+ },
+ "https://www.zappos.com/p/mens-hoka-clifton-10/product/9984276": {
+  "correct": true,
+  "note": "men's Clifton 10, page offers several colourways"
+ },
+ "https://palomacoffeebakery.com/products/fellow-stagg-ekg-electric-kettle": {
+  "correct": true,
+  "note": "original EKG, $165"
+ },
+ "https://fathomcoffee.com/product/fellow-stagg-ekg-electric-kettle-2/": {
+  "correct": false,
+  "note": "wood-handle colour combos at $255, not the base kettle"
+ },
+ "https://www.domacoffee.com/products/fellow-ekg-kettle": {
+  "correct": true
+ },
+ "https://www.cjhampshire.co.uk/ninja-af100uk-100054731.html": {
+  "correct": true
+ },
+ "https://www.combensapps.co.uk/ninja-af100uk-grey-100002708.html": {
+  "correct": true
+ },
+ "https://drelectrical.co.uk/product/3-8l-air-fryer-and-dehydrator-grey/": {
+  "correct": true
+ },
+ "https://www.littlewoods.com/ninja-air-fryer-af100uk/1600348148.prd?bvstate=pg%3A31%2Fct%3Ar": {
+  "correct": true
+ },
+ "https://www.lookfantastic.fr/p/the-ordinary-niacinamide-10-zinc-1-serum-30ml/13187076/": {
+  "correct": true
+ },
+ "https://www.my-origines.com/lt/niacinamide-10-zinc-1-89K57X02.html": {
+  "correct": false,
+  "note": "Lithuanian store, not the French market"
+ },
+ "https://rununited.com/hoka-mens-clifton-10-raw-linen-stone-running-shoes": {
+  "correct": true,
+  "note": "same colourway"
+ },
+ "https://www.boticinal.com/the-ordinary-niacinamide-10-zinc-1-serum-anti-imperfections-visage-peaux-normales-a-imperfections-30ml.html": {
+  "correct": true,
+  "note": "French parapharmacy, 30 ml"
+ },
+ "https://www.walmart.com/ip/Lodge-10-1-4-Cast-Iron-Skillet/5969628": {
+  "correct": true,
+  "note": "10-1/4 in = L8SK3"
+ },
+ "https://www.mobiletvservices.co.uk/ninja-af100uk-grey-20251.html": {
+  "correct": true
+ },
+ "https://www.thewashhouse.com/ninja/ninja-af100uk-grey-200112629": {
+  "correct": true
+ },
+ "https://panasonicstore-inverness.com/ninja-af100uk-50009826.html": {
+  "correct": true
+ },
+ "https://www.sainsburys.co.uk/groceries/product/ninja-38l-air-fryer-and-dehydrator-%E2%80%93-af100uk": {
+  "correct": true
+ },
+ "https://www.notino.fr/the-ordinary/niacinamide-10-zinc-1-high-strength-vitamin-and-mineral-blemish-formula-serum-leger-visage-anti-imperfections-de-la-peau": {
+  "correct": false,
+  "note": "€10.80 and another EAN on an earlier read: the 60 ml bottle"
+ },
+ "https://www.my-origines.com/fr/niacinamide-10-zinc-1-89K57102.html?sds=0&sop=0&bvstate=pg%3A3%2Fct%3Ar": {
+  "correct": true,
+  "note": "French section of the shop, €6"
+ },
+ "https://www.marskramer.nl/philips-airfryer-essential-hd9252-70-212-9252/": {
+  "correct": true,
+  "note": "HD9252/70 is the Essential Airfryer L"
+ },
+ "https://re.now/products/philips-airfryer-essential-hd9252-70-1400w": {
+  "correct": false,
+  "note": "outlet for graded customer returns, not new"
+ },
+ "https://www.thewashhouse.com/ninja/ninja-af100uk-grey-200112629.html": {
+  "correct": true
+ },
+ "https://www.notonthehighstreet.com/helenround/product/winter-fox-linen-tea-towel": {
+  "correct": true,
+  "note": "the maker's own storefront on Not On The High Street"
+ },
+ "https://www.pharmacie-forum-halles-paris.com/the-ordinary-niacinamide-10-zinc-1-30ml-p51129": {
+  "correct": true,
+  "note": "Paris pharmacy, 30 ml"
+ }
+}
