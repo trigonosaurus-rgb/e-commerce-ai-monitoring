@@ -127,7 +127,7 @@ function Notifications({ settings }: { settings: NotificationSettings }) {
               <Label htmlFor="alert-email" className="sr-only">Alert email</Label>
               <Input id="alert-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               {emailChanged && (
-                <Button type="submit" size="sm" className="h-8" disabled={save.isPending}>
+                <Button type="submit" variant="outline" size="sm" className="h-8" disabled={save.isPending}>
                   Save
                 </Button>
               )}
