@@ -100,6 +100,14 @@ async def extract_product(text: str, url: str, *, usage: UsageSink | None) -> Pr
     )
 
 
+EDITIONS = (
+    "Editions, generations and bundles are different products: if one listing's name or "
+    "page title has a marker the other lacks (Pro, Studio, Plus, Max, Mini, SE, 2, Gen 2, "
+    "set, bundle, kit), they differ. A store in another country (country domain or path "
+    "such as /lt/, another language) is another market even when the currency matches. "
+)
+
+
 # ----------------------------------------------------------------- search planning
 
 
@@ -191,7 +199,7 @@ async def judge_candidates(
         "(same model and variant) to customers in the same market. Reject: used, refurbished "
         "or renewed items; stores clearly serving another country or currency; reviews, "
         "articles, price-comparison sites, marketplaces with many sellers, category pages "
-        "and other models. " + UNTRUSTED,
+        "and other models. " + EDITIONS + UNTRUSTED,
         prompt=f"Product: {json.dumps(product)}\n"
         f"Our market: {market or 'unknown'}, currency: {currency or 'unknown'}\n"
         f"<page>\n{listing}\n</page>\nReturn one verdict per result index.",
@@ -212,7 +220,9 @@ async def compare_products(ours: dict, theirs: dict, *, usage: UsageSink | None)
         usage=usage,
         instructions="Decide whether two store listings are the same product (same model and "
         "variant such as size, color, capacity; new vs used/refurbished counts as different). "
-        "Be strict, but don't reject only because a detail is not mentioned. " + UNTRUSTED,
+        "Be strict, but don't reject only because a detail is not mentioned. "
+        + EDITIONS
+        + UNTRUSTED,
         prompt=f"Our product: {json.dumps(ours)}\n"
         f"<page>\nTheir listing: {json.dumps(theirs)}\n</page>",
     )

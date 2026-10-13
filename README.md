@@ -56,10 +56,12 @@ refurbished and other-market offers (other country or currency) are rejected wit
 
 **Reading a price.** Most shops (Shopify, WooCommerce, Shopware, Magento, big retailers) publish
 schema.org `Product`/`Offer` JSON-LD — exact and free. Pages without it go to the LLM, which must
-quote the page text it read the price from; the quote is checked against the page. If a store
-blocks direct requests or renders prices with JavaScript, the page is fetched through Tavily
-Extract. Rivalscope never disguises itself or bypasses bot protection: a blocked page is shown as
-blocked.
+quote the page text it read the price from; the quote is checked against the page. Pages are
+requested the way a local customer sees them: multi-country shops (Shopify "markets") get a
+country hint, otherwise a UK shop shows a visitor from Germany its price without VAT. If a store
+refuses the request, Rivalscope asks once more as an openly named crawler (`RivalscopeBot`) —
+many Shopify stores welcome that — and only then pays for Tavily Extract. It never disguises
+itself or bypasses bot protection: a blocked page is shown as blocked.
 
 **Not trusting a single reading.** A price that moves more than 60% in one check, or changes
 currency, is stored as evidence but flagged for review instead of triggering an alert.
@@ -76,6 +78,41 @@ currency, is stored as evidence but flagged for review instead of triggering an 
 | Polling instead of SSE | Works through any proxy, needs no reconnection logic; the UI feels just as live at 1.5 s. |
 | One service | The Next.js app is exported to static files and served by FastAPI: one image, one port, same-origin cookies. |
 | SSRF guard on every redirect hop | Users submit URLs the server fetches; private, loopback and metadata addresses are refused. |
+
+## Evaluation
+
+The discovery agent was first tuned on German stores, so it was tested on 10 products from
+other markets and niches ([cases](evals/discovery/cases.json),
+[full report](evals/discovery/results/latest.md)): branded goods with and without barcodes,
+running shoes in one colourway, a specialty-coffee kettle, a small designer's tea towel, and a
+shop's own-brand tin as a negative control.
+
+| Market | Cases | Correct matches proposed | Wrong |
+|---|---|---|---|
+| United States | 3 | 12 | 0 |
+| United Kingdom | 3 | 3 (none expected for the own-brand tin) | 0 |
+| France | 2 | 7 | 0 |
+| Netherlands | 1 | 0 (product discontinued, no store found) | 0 |
+| Poland (PLN) | 1 | 2 | 0 |
+
+What the first run found and what changed:
+[baseline](evals/discovery/results/baseline.md) — 17 correct, 2 wrong.
+
+- Retailer domains written by the model with spaces ("sur la table.com") made the search API
+  reject the whole retailer search in 5 of 10 runs; they are now cleaned.
+- Structured data often drops the variant: a shoe page says "HOKA Clifton 10" while its title
+  says "Men's … Raw Linen/Stone". The page title is now part of the product identity, and
+  editions (Pro, Studio, SE, bundles) and other-country shops in the same currency are rejected.
+- Shopify stores answered a browser-like client with HTTP 429, a UK store showed a price without
+  VAT to a visitor abroad, and a deleted product redirected to the home page, whose featured
+  product would have been read instead (see "Reading a price").
+
+Honest caveats: matches are labelled by hand (a shared barcode counts automatically), the rules
+were adjusted after the baseline on the same 10 cases, and recall is not measured — big chains
+(John Lewis, Currys, Amazon, Sephora, REI) often render prices with JavaScript or block both
+direct requests and the backup reader, so they rarely appear among the matches. Re-run with
+`uv run python -m evals.discovery.run`; search answers are cached, so a re-run costs a few
+Tavily credits and about $0.02 in AI.
 
 ## Cost
 
@@ -115,6 +152,10 @@ uv run python -m backend.cli export-demo you@example.com demo.json
 uv run python -m backend.cli seed-demo demo.json    # load a workspace into the public demo
 ```
 
+Price checks run inside the server. To collect history without keeping it running, schedule
+`uv run python -m backend.cli check-due` (cron, or `scripts/schedule-checks.ps1` on Windows):
+it runs the checks that are due and exits.
+
 ### Docker
 
 ```bash
@@ -134,7 +175,7 @@ container per database: the scheduler lives inside the process.
 
 ## Quality
 
-- 56 tests run offline (`uv run pytest`): price extraction on real-world page shapes, SSRF
+- 65 tests run offline (`uv run pytest`): price extraction on real-world page shapes, SSRF
   protection, monitoring rules, the agent graph with a fake web/LLM, the API, demo read-only mode.
 - `ruff` for the backend, ESLint + TypeScript for the frontend, migrations checked against the
   models, Docker build — all in [CI](.github/workflows/ci.yml).
@@ -155,6 +196,7 @@ backend/
   notify/              Telegram and email delivery
   api/                 FastAPI routers;  auth.py: sessions, demo workspace
   migrations/          Alembic migrations, applied on startup
+evals/discovery/       cross-market eval of the agent: cases, labels, reports
 frontend/src/
   app/                 dashboard, product, agent run, activity, alerts, settings, login
   lib/                 typed API client, data hooks, formatting
@@ -162,7 +204,8 @@ frontend/src/
 
 ## Limitations
 
-- Sites with aggressive bot protection (e.g. Amazon) are often unreadable and shown as blocked.
+- Sites with aggressive bot protection or JavaScript-only prices (e.g. Amazon, John Lewis,
+  Currys, Sephora) are often unreadable and shown as blocked or "no price found".
 - Product variants (size, color) are matched carefully, but the final word is the user's approval.
 - Prices are compared only within one currency; other markets are out of scope by design.
 - Price history in the demo is real and grows with time — it started in October 2026.

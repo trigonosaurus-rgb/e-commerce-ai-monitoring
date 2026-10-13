@@ -3,6 +3,7 @@
     uv run python -m evals.discovery.run                    # all cases
     uv run python -m evals.discovery.run us-hoka-clifton    # selected cases
     uv run python -m evals.discovery.run --fresh            # ignore the search cache
+    uv run python -m evals.discovery.run --rescore          # re-apply labels.json only
 
 Each case runs the real agent (real OpenAI calls, real page downloads) in a throw-away
 database. Tavily answers are cached on disk (`evals/.cache/`), so re-running after a
@@ -264,7 +265,10 @@ async def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("only", nargs="*", help="case ids to run (default: all)")
     parser.add_argument("--fresh", action="store_true", help="don't use cached Tavily answers")
+    parser.add_argument("--rescore", action="store_true", help="only re-apply labels.json")
     args = parser.parse_args()
+    if args.rescore:
+        args.only = ["-"]  # no case matches: the last results are kept and re-scored
 
     cases = json.loads((HERE / "cases.json").read_text("utf-8"))
     if args.only:
@@ -279,7 +283,7 @@ async def main() -> None:
         session.commit()
         user_id = user.id
     meter = TavilyMeter(fresh=args.fresh)
-    usage_before = tavily_account_usage()
+    usage_before = None if args.rescore else tavily_account_usage()
     results = []
     for case in cases:
         print(f"→ {case['id']} ({case['market']})", flush=True)
@@ -291,7 +295,7 @@ async def main() -> None:
             flush=True,
         )
         results.append(result)
-    usage_after = tavily_account_usage()
+    usage_after = None if args.rescore else tavily_account_usage()
     delta = usage_after - usage_before if None not in (usage_before, usage_after) else None
 
     out = HERE / "results"
@@ -301,6 +305,12 @@ async def main() -> None:
         old = {r["id"]: r for r in json.loads((out / "latest.json").read_text("utf-8"))}
         order = [c["id"] for c in json.loads((HERE / "cases.json").read_text("utf-8"))]
         results = [fresh.get(i) or old[i] for i in order if i in fresh or i in old]
+    for result in results:  # labels added since a case last ran count too
+        for proposal in result["proposals"]:
+            if proposal["score"] == "unlabeled" and proposal["url"] in labels:
+                proposal["score"] = "correct" if labels[proposal["url"]]["correct"] else "wrong"
+        for key in ("correct", "wrong", "unlabeled"):
+            result[key] = sum(1 for p in result["proposals"] if p["score"] == key)
     (out / "latest.json").write_text(
         json.dumps(results, ensure_ascii=False, indent=1), encoding="utf-8"
     )
