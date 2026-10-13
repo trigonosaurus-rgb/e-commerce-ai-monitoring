@@ -200,7 +200,7 @@ async def test_discovery_retries_and_proposes_verified_offers(fake_world):
     assert any("refurb.de: rejected — Sells it refurbished" in m for m in messages)
     assert any("uk-shop.co.uk: rejected — Sells in GBP" in m for m in messages)
     assert any(
-        "bundle.de: rejected — The name matches, but the price is +100%" in m for m in messages
+        "bundle.de: rejected — The name matches, but the price is 2.0× yours" in m for m in messages
     )
     assert events[-1].step == "propose"
     research = next(e for e in events if e.step == "research")

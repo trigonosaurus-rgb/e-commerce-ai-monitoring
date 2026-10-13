@@ -20,7 +20,7 @@ from backend.auth import (
 from backend.config import get_settings
 from backend.database import SessionDep
 from backend.models import AccessRequest, User
-from backend.notify.telegram import poller
+from backend.notify.telegram import bot_username, poller
 from backend.scheduler import scheduler
 
 router = APIRouter(tags=["account"])
@@ -61,7 +61,7 @@ def _notification_state(user: User) -> dict:
         "alert_email": user.alert_email or user.email,
         "notify_telegram": user.notify_telegram,
         "telegram_connected": bool(user.telegram_chat_id),
-        "telegram_available": settings.telegram_configured and bool(settings.telegram_bot_username),
+        "telegram_available": settings.telegram_configured and bool(bot_username()),
         "email_available": settings.email_configured,
     }
 
@@ -84,14 +84,12 @@ def update_notifications(body: NotificationSettings, user: CurrentUser, session:
 @router.post("/settings/telegram/link")
 def telegram_link(user: CurrentUser, session: SessionDep):
     settings = get_settings()
-    if not (settings.telegram_configured and settings.telegram_bot_username):
+    if not (settings.telegram_configured and bot_username()):
         raise api_error(503, "not_configured", "Telegram alerts are not set up on this server.")
     user = session.merge(user)
     user.telegram_link_token = secrets.token_urlsafe(16)
     session.commit()
-    return {
-        "url": f"https://t.me/{settings.telegram_bot_username}?start={user.telegram_link_token}"
-    }
+    return {"url": f"https://t.me/{bot_username()}?start={user.telegram_link_token}"}
 
 
 @router.post("/settings/telegram/unlink")

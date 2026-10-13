@@ -42,9 +42,10 @@ from backend.monitor import fmt_money, read_price
 log = logging.getLogger(__name__)
 MAX_ATTEMPTS = 2
 ENOUGH_OFFERS = 2
-# a name-only match (no shared EAN or part number) this far from our price is usually
-# another size, a bundle or an accessory
-MAX_PRICE_GAP_PCT = 50
+# a name-only match (no shared EAN or part number) at twice or half our price is usually
+# another size, a bundle or an edition; ordinary price differences between stores (a
+# discounted reference vs full price elsewhere) stay below this
+MAX_PRICE_RATIO = 1.8
 MIN_SCREEN_CONFIDENCE = 0.5
 
 
@@ -516,15 +517,14 @@ async def verify(state: DiscoveryState, runtime: Runtime[DiscoveryContext]) -> d
                 return c, None, match.reason
             confidence, reason = min(match.confidence, c["confidence"]), match.reason
             own_price = state.get("own_price")
-            if own_price and abs(gap := (reading.price - own_price) / own_price * 100) > (
-                MAX_PRICE_GAP_PCT
-            ):
+            ratio = reading.price / own_price if own_price else 1
+            if not 1 / MAX_PRICE_RATIO <= ratio <= MAX_PRICE_RATIO:
                 return (
                     c,
                     None,
                     (
-                        f"The name matches, but the price is {gap:+.0f}% from yours with no shared "
-                        "EAN or part number — probably another size, bundle or edition."
+                        f"The name matches, but the price is {ratio:.1f}× yours with no shared EAN "
+                        "or part number — probably another size, bundle or edition."
                     ),
                 )
         offer = {

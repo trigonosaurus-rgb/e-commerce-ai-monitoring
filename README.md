@@ -33,8 +33,9 @@ comes with the page fragment it was read from**, so nothing has to be taken on t
 ```mermaid
 flowchart LR
     subgraph Discovery agent · once per product
-        A[Read your page] --> B[Plan searches<br/>+ likely retailers]
-        B --> C[Web search<br/>Tavily]
+        A[Read your page] --> B[Plan searches]
+        B --> R[Research the market<br/>who sells this kind of product]
+        R --> C[Web search<br/>Tavily]
         C --> D[Screen results<br/>LLM]
         D --> E[Verify each store<br/>price + same product]
         E -- fewer than 2 matches --> B
@@ -49,6 +50,14 @@ flowchart LR
     end
     H --> G
 ```
+
+**Researching the market.** Before looking for the product itself, the agent searches for
+this *kind* of product in the market ("gooseneck electric kettle shop", "autocuiseur 7,5 L
+acheter") to see which stores sell it right now. Retailers the model knows from training are
+added only if their domain exists, shops on another country's domain are dropped, and the model
+sorts the rest into online shops, brand shops, marketplaces, comparison sites and magazines —
+every decision with a reason in the run timeline. The product is then searched on the shops
+that are left.
 
 **Matching the same product.** EAN/GTIN codes decide when both pages have them (they usually do);
 otherwise the manufacturer part number; only then the LLM compares the two listings. Used,
@@ -90,7 +99,7 @@ shop's own-brand tin as a negative control.
 | Market | Cases | Correct matches proposed | Wrong |
 |---|---|---|---|
 | United States | 3 | 12 | 0 |
-| United Kingdom | 3 | 3 (none expected for the own-brand tin) | 0 |
+| United Kingdom | 3 | 5 (none expected for the own-brand tin) | 0 |
 | France | 2 | 7 | 0 |
 | Netherlands | 1 | 0 (product discontinued, no store found) | 0 |
 | Poland (PLN) | 1 | 2 | 0 |
@@ -98,8 +107,15 @@ shop's own-brand tin as a negative control.
 What the first run found and what changed:
 [baseline](evals/discovery/results/baseline.md) — 17 correct, 2 wrong.
 
-- Retailer domains written by the model with spaces ("sur la table.com") made the search API
-  reject the whole retailer search in 5 of 10 runs; they are now cleaned.
+- Retailers came from the model's memory, written as free text: "sur la table.com" made the
+  search API reject the whole retailer search in 5 of 10 runs. Domains are now constrained by
+  a pattern in the structured-output schema, and the retailer list comes from the market
+  research step above instead of memory alone.
+- The research step first kept other brands' own shops (Smithey for a Lodge skillet, Nike for
+  HOKA shoes) and shops of neighbouring countries (Belgian stores for the Dutch market); both
+  are filtered now.
+- A name-only match at about twice our price was a 60 ml bottle instead of 30 ml; without a
+  shared barcode or part number such a gap now rejects the match.
 - Structured data often drops the variant: a shoe page says "HOKA Clifton 10" while its title
   says "Men's … Raw Linen/Stone". The page title is now part of the product identity, and
   editions (Pro, Studio, SE, bundles) and other-country shops in the same currency are rejected.
@@ -108,11 +124,14 @@ What the first run found and what changed:
   product would have been read instead (see "Reading a price").
 
 Honest caveats: matches are labelled by hand (a shared barcode counts automatically), the rules
-were adjusted after the baseline on the same 10 cases, and recall is not measured — big chains
+were adjusted after the baseline on the same 10 cases, and results vary between runs — the same
+case found 0 matches in one run and 3 in the next, because search results and the screening
+model's choices differ. An outlet for customer returns once passed as new (it didn't say so in
+its product data); approval by a person remains the last check. Recall is not measured — big chains
 (John Lewis, Currys, Amazon, Sephora, REI) often render prices with JavaScript or block both
 direct requests and the backup reader, so they rarely appear among the matches. Re-run with
-`uv run python -m evals.discovery.run`; search answers are cached, so a re-run costs a few
-Tavily credits and about $0.02 in AI.
+`uv run python -m evals.discovery.run`; search answers are cached, but the model plans slightly
+different queries each time, so a full run costs about 60 Tavily credits and $0.04 in AI.
 
 ## Cost
 
@@ -120,7 +139,7 @@ Measured on real runs (OpenAI `gpt-6-luna` for extraction/screening, `gpt-6.1-so
 
 | What | Typical cost |
 |---|---|
-| Discovery run (find competitors for one product) | $0.001–0.003 + ~10 Tavily credits |
+| Discovery run (find competitors for one product) | $0.002–0.005 + 5–10 Tavily credits |
 | Scheduled check of a product with 4–7 pages | $0 when stores publish structured data, ~$0.0005 otherwise |
 | 20 products × 4 competitors, checked twice a day | ≈ $2–4 / month in AI + Tavily free tier |
 
@@ -168,14 +187,16 @@ container per database: the scheduler lives inside the process.
 
 ### Notifications
 
-- **Telegram:** create a bot with [@BotFather](https://t.me/BotFather), set `TELEGRAM_BOT_TOKEN`
-  and `TELEGRAM_BOT_USERNAME`. Users connect their chat in Settings (no webhook needed).
-- **Email:** any SMTP server (`SMTP_*` variables). For reliable delivery to customers use a
-  sending service with your own domain.
+- **Telegram:** create a bot with [@BotFather](https://t.me/BotFather) and set
+  `TELEGRAM_BOT_TOKEN` (the bot's name is read from Telegram). Users connect their chat in
+  Settings (no webhook needed).
+- **Email:** any SMTP server (`SMTP_*` variables). Use a sending service such as
+  [Resend](https://resend.com/docs/send-with-smtp) rather than a personal mailbox: its key can
+  only send mail. Until your domain is verified there, it delivers only to your own address.
 
 ## Quality
 
-- 65 tests run offline (`uv run pytest`): price extraction on real-world page shapes, SSRF
+- 66 tests run offline (`uv run pytest`): price extraction on real-world page shapes, SSRF
   protection, monitoring rules, the agent graph with a fake web/LLM, the API, demo read-only mode.
 - `ruff` for the backend, ESLint + TypeScript for the frontend, migrations checked against the
   models, Docker build — all in [CI](.github/workflows/ci.yml).

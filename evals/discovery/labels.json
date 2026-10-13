@@ -136,5 +136,16 @@
  "https://re.now/products/philips-airfryer-essential-hd9252-70-1400w": {
   "correct": false,
   "note": "outlet for graded customer returns, not new"
+ },
+ "https://www.thewashhouse.com/ninja/ninja-af100uk-grey-200112629.html": {
+  "correct": true
+ },
+ "https://www.notonthehighstreet.com/helenround/product/winter-fox-linen-tea-towel": {
+  "correct": true,
+  "note": "the maker's own storefront on Not On The High Street"
+ },
+ "https://www.pharmacie-forum-halles-paris.com/the-ordinary-niacinamide-10-zinc-1-30ml-p51129": {
+  "correct": true,
+  "note": "Paris pharmacy, 30 ml"
  }
 }

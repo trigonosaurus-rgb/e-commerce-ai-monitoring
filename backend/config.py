@@ -55,7 +55,7 @@ class Settings(BaseSettings):
 
     # --- Notifications -------------------------------------------------------------
     telegram_bot_token: SecretStr | None = None
-    telegram_bot_username: str | None = None  # without @, used for the "Connect" deep link
+    telegram_bot_username: str | None = None  # optional: asked from Telegram when empty
     owner_telegram_chat_id: str | None = None  # access requests are forwarded here
     smtp_host: str | None = None
     smtp_port: int = 587

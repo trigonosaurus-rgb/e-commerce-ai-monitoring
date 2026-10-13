@@ -47,15 +47,23 @@ async def send_message(chat_id: str, html_text: str) -> None:
     )
 
 
+def bot_username() -> str | None:
+    """TELEGRAM_BOT_USERNAME if set, otherwise the name Telegram reported for the token."""
+    return get_settings().telegram_bot_username or poller.username
+
+
 class TelegramPoller:
     def __init__(self) -> None:
         self.status = "stopped"
         self.last_error: str | None = None
+        self.username: str | None = None  # learned from getMe, so it needn't be configured
 
     async def run_forever(self) -> None:
         offset: int | None = None
         while True:
             try:
+                if self.username is None:
+                    self.username = (await call("getMe", {}))["username"]
                 updates = await self._get_updates(offset)
                 self.status, self.last_error = "running", None
                 for update in updates:
