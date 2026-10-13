@@ -8,6 +8,7 @@ from backend.fetching import (
     UnsafeURLError,
     ensure_public_url,
     fetch_page,
+    market_country_code,
     normalize_url,
 )
 
@@ -108,3 +109,49 @@ async def test_plain_text_answer_is_treated_as_a_block_not_a_dead_link():
         with pytest.raises(FetchError, match="text/plain instead of a page") as info:
             await fetch_page(f"{PUBLIC}/product", client=client)
     assert not isinstance(info.value, PermanentFetchError)
+
+
+async def test_refused_browser_request_is_retried_as_named_crawler():
+    agents = []
+
+    def handler(request):
+        agents.append(request.headers["user-agent"])
+        if "RivalscopeBot" not in request.headers["user-agent"]:
+            return httpx.Response(429, html="<html><body>Too many requests</body></html>")
+        return httpx.Response(200, html="<html><body><main>" + "Linen towel. " * 40 + "</main>")
+
+    async with _client(handler) as client:
+        page = await fetch_page(f"{PUBLIC}/products/towel", client=client)
+    assert page.via == "direct" and "Linen towel" in page.text
+    assert len(agents) == 2 and "RivalscopeBot" in agents[1]
+
+
+async def test_product_link_landing_on_home_page_counts_as_removed():
+    def handler(request):
+        if request.url.path == "/products/kettle":
+            return httpx.Response(301, headers={"location": "/"})
+        return httpx.Response(200, html="<html><body><main>" + "Featured grinder " * 40)
+
+    async with _client(handler) as client:
+        with pytest.raises(PermanentFetchError, match="home page"):
+            await fetch_page(f"{PUBLIC}/products/kettle", client=client)
+
+
+def test_market_country_comes_from_market_or_domain():
+    assert market_country_code("https://shop.example.com/p", "United Kingdom") == "GB"
+    assert market_country_code("https://www.lakeland.co.uk/products/tin") == "GB"
+    assert market_country_code("https://mediamarkt.pl/p") == "PL"
+    assert market_country_code("https://brand.io/p") is None  # .io is not a country shop
+    assert market_country_code("https://us.lacabra.com/p") is None
+
+
+async def test_shop_is_asked_for_its_local_price():
+    cookies = []
+
+    def handler(request):
+        cookies.append(request.headers.get("cookie"))
+        return httpx.Response(200, html="<html><body><main>" + "Brownie tin. " * 40)
+
+    async with _client(handler) as client:
+        await fetch_page(f"{PUBLIC}/products/tin", client=client, market="united kingdom")
+    assert cookies == ["localization=GB"]

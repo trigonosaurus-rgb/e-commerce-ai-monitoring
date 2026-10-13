@@ -362,7 +362,7 @@ async def verify(state: DiscoveryState, runtime: Runtime[DiscoveryContext]) -> d
     async def check(c: dict) -> tuple[dict, dict | None, str]:
         async with limit:
             try:
-                reading, data = await read_price(c["url"], run)
+                reading, data = await read_price(c["url"], run, state.get("market"))
             except (FetchError, llm.LLMError) as exc:
                 return c, None, str(exc)
         currency = state.get("currency")

@@ -54,3 +54,6 @@ frontend/out/
 
 # Playwright MCP screenshots/logs
 .playwright-mcp/
+
+# discovery eval: throw-away DB and cached search answers
+evals/.cache/

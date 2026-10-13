@@ -5,8 +5,11 @@
    `http://localhost:...` or the cloud metadata endpoint — an SSRF attack).
    Every redirect hop is checked again.
 2. A plain HTTPS request (fast, free, keeps the raw HTML with its structured price data).
-3. If the site refuses us (403/429/bot page), Tavily Extract fetches it from its servers.
-   We don't try to disguise ourselves or bypass bot protection.
+   If the site refuses it, we ask once more as an openly named crawler: many shops
+   (e.g. Shopify stores behind Cloudflare) turn away a browser-like request that doesn't
+   come from a real browser, but welcome a bot that says what it is.
+3. If the site still refuses us (403/429/bot page), Tavily Extract fetches it from its
+   servers. We don't try to disguise ourselves or bypass bot protection.
 """
 
 import asyncio
@@ -14,6 +17,7 @@ import ipaddress
 import logging
 import re
 import socket
+from contextlib import AsyncExitStack
 from dataclasses import dataclass
 from urllib.parse import urljoin, urlsplit
 
@@ -33,11 +37,44 @@ HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "en-US,en;q=0.9,de;q=0.8",
 }
+CRAWLER_HEADERS = HEADERS | {
+    "User-Agent": (
+        "Mozilla/5.0 (compatible; RivalscopeBot/0.2; "
+        "+https://github.com/trigonosaurus-rgb/e-commerce-ai-monitoring)"
+    )
+}
 _BLOCK_MARKERS = re.compile(
     r"captcha|access denied|are you a robot|verify you are human|just a moment|cf-chl|"
     r"enable javascript and cookies",
     re.IGNORECASE,
 )
+# Shops with several "markets" (built into Shopify) show visitors from abroad another
+# price: without local VAT or converted to another currency. This cookie asks for the
+# price local customers see. Other sites simply ignore it.
+COUNTRY_CODES = {
+    "united states": "US",
+    "united kingdom": "GB",
+    "canada": "CA",
+    "australia": "AU",
+    "ireland": "IE",
+    "germany": "DE",
+    "austria": "AT",
+    "switzerland": "CH",
+    "france": "FR",
+    "belgium": "BE",
+    "netherlands": "NL",
+    "luxembourg": "LU",
+    "spain": "ES",
+    "portugal": "PT",
+    "italy": "IT",
+    "poland": "PL",
+    "czech republic": "CZ",
+    "sweden": "SE",
+    "denmark": "DK",
+    "norway": "NO",
+    "finland": "FI",
+}
+GENERIC_CCTLDS = {"io", "co", "ai", "me", "tv", "cc", "fm", "ly", "gg", "to", "sh", "ws", "eu"}
 MAX_REDIRECTS = 5
 # clearly a file, not a product page: no point trying another route
 FILE_TYPES = (
@@ -106,6 +143,16 @@ async def ensure_public_url(url: str) -> None:
             raise UnsafeURLError("Links to private or local network addresses are not allowed.")
 
 
+def market_country_code(url: str, market: str | None = None) -> str | None:
+    """ISO code of the shop's home market: from the product's market, else the domain."""
+    if market and (code := COUNTRY_CODES.get(market.strip().lower())):
+        return code
+    tld = (urlsplit(url).hostname or "").rsplit(".", 1)[-1]
+    if len(tld) != 2 or tld in GENERIC_CCTLDS:
+        return None
+    return "GB" if tld == "uk" else tld.upper()
+
+
 def html_to_text(html: str) -> str:
     soup = BeautifulSoup(html, "html.parser")
     for tag in soup(["script", "style", "noscript", "svg", "iframe", "template"]):
@@ -124,12 +171,14 @@ def _looks_blocked(status: int, text: str) -> bool:
     return len(text) < 1500 and bool(_BLOCK_MARKERS.search(text))
 
 
-async def _fetch_direct(url: str, client: httpx.AsyncClient) -> tuple[int, Page]:
+async def _fetch_direct(
+    url: str, client: httpx.AsyncClient, headers: dict[str, str]
+) -> tuple[int, Page]:
     settings = get_settings()
     current = url
     for _ in range(MAX_REDIRECTS + 1):
         await ensure_public_url(current)
-        async with client.stream("GET", current, headers=HEADERS) as response:
+        async with client.stream("GET", current, headers=headers) as response:
             if response.is_redirect:
                 location = response.headers.get("location")
                 if not location:
@@ -154,35 +203,56 @@ async def _fetch_direct(url: str, client: httpx.AsyncClient) -> tuple[int, Page]
     raise FetchError("The site redirects too many times.")
 
 
-async def fetch_page(url: str, *, client: httpx.AsyncClient | None = None) -> Page:
-    """Returns the page or raises FetchError with a user-readable reason."""
-    settings = get_settings()
-    await ensure_public_url(url)
-    reason = "unknown error"
+async def _try_direct(url: str, client: httpx.AsyncClient, headers: dict) -> Page | str:
+    """The page, or the reason the site refused it (dead links and unsafe URLs raise)."""
     try:
-        if client is None:
-            async with httpx.AsyncClient(
-                timeout=settings.fetch_timeout_seconds, follow_redirects=False
-            ) as own_client:
-                status, page = await _fetch_direct(url, own_client)
-        else:
-            status, page = await _fetch_direct(url, client)
-        if status in (404, 410):
-            raise PermanentFetchError(
-                f"Page not found (HTTP {status}) — the product may have been removed."
-            )
-        if status == 200 and not _looks_blocked(status, page.text):
-            return page
-        reason = f"HTTP {status}" if status != 200 else "the site showed a bot-check page"
+        status, page = await _fetch_direct(url, client, headers)
     except UnsafeURLError, PermanentFetchError:
         raise
     except FetchError as exc:
-        reason = str(exc)
+        return str(exc)
     except httpx.TimeoutException:
-        reason = "the site did not respond in time"
+        return "the site did not respond in time"
     except httpx.HTTPError as exc:
-        reason = f"connection error ({type(exc).__name__})"
+        return f"connection error ({type(exc).__name__})"
+    if status in (404, 410):
+        raise PermanentFetchError(
+            f"Page not found (HTTP {status}) — the product may have been removed."
+        )
+    if status == 200 and not _looks_blocked(status, page.text):
+        if urlsplit(url).path.strip("/") and not urlsplit(page.url).path.strip("/"):
+            # shops often send links of deleted products to the home page, whose
+            # "featured product" data would otherwise be read as this product
+            raise PermanentFetchError(
+                "The link now opens the shop's home page — the product may have been removed."
+            )
+        return page
+    return f"HTTP {status}" if status != 200 else "the site showed a bot-check page"
 
+
+async def fetch_page(
+    url: str, *, client: httpx.AsyncClient | None = None, market: str | None = None
+) -> Page:
+    """Returns the page or raises FetchError with a user-readable reason.
+    `market` (e.g. "united kingdom") asks multi-country shops for their local price."""
+    settings = get_settings()
+    await ensure_public_url(url)
+    country = market_country_code(url, market)
+    cookie = {"Cookie": f"localization={country}"} if country else {}
+    async with AsyncExitStack() as stack:
+        if client is None:
+            client = await stack.enter_async_context(
+                httpx.AsyncClient(timeout=settings.fetch_timeout_seconds, follow_redirects=False)
+            )
+        result = await _try_direct(url, client, HEADERS | cookie)
+        if isinstance(result, str) and not result.startswith(("the site did not", "connection")):
+            log.info("%s refused a browser-like request (%s), asking as a crawler", url, result)
+            second = await _try_direct(url, client, CRAWLER_HEADERS | cookie)
+            if isinstance(second, Page):
+                return second
+        if isinstance(result, Page):
+            return result
+    reason = result
     if settings.search_configured:
         log.info("Direct fetch of %s failed (%s), trying Tavily Extract", url, reason)
         if page := await fetch_via_tavily(url):

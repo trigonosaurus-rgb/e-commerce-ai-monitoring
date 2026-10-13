@@ -56,7 +56,7 @@ def fake_world(monkeypatch):
     async def fake_read_product_data(page, usage=None):
         return OURS
 
-    async def fake_read_price(url, usage):
+    async def fake_read_price(url, usage, market=None):
         if url == "https://blocked.de/xm6":
             raise FetchError("Couldn't load the page: HTTP 403.")
         reading = Reading(

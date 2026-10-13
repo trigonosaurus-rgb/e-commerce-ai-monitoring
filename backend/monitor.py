@@ -55,8 +55,10 @@ class Reading:
     reused_from_minutes: int | None = None  # set when another workspace read it moments ago
 
 
-async def read_price(url: str, usage: llm.UsageSink | None) -> tuple[Reading, ProductData]:
-    page = await fetch_page(url)
+async def read_price(
+    url: str, usage: llm.UsageSink | None, market: str | None = None
+) -> tuple[Reading, ProductData]:
+    page = await fetch_page(url, market=market)
     data = await read_product_data(page, usage=usage)
     if not data.has_price and page.via == "direct" and get_settings().search_configured:
         # second chance: the price may appear only after JavaScript runs
@@ -253,8 +255,11 @@ async def check_offer(offer_id: int, run: RunLogger) -> tuple[bool, OfferChange 
     settings = get_settings()
     with session_scope() as session:
         offer = session.get(Offer, offer_id)
+        market = session.get(Product, offer.product_id).market
     try:
-        reading = recent_reading(offer.url, offer_id) or (await read_price(offer.url, run))[0]
+        reading = (
+            recent_reading(offer.url, offer_id) or (await read_price(offer.url, run, market))[0]
+        )
     except (FetchError, llm.LLMError) as exc:
         with session_scope() as session:
             failed = session.get(Offer, offer_id)

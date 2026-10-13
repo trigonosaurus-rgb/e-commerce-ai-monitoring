@@ -189,6 +189,15 @@ def _from_jsonld(soup: BeautifulSoup, page_url: str) -> ProductData | None:
         return None
 
     target = _url_key(page_url)
+
+    def describes_this_page(product: dict) -> bool:
+        urls = [product.get("url")] + [o.get("url") for o in _offers_of(product)]
+        return any(
+            isinstance(u, str) and _url_key(u).split("?")[0] == target.split("?")[0] for u in urls
+        )
+
+    # pages also carry "related" or "featured" products: the one about this page goes first
+    products.sort(key=lambda node: not describes_this_page(node))
     best: tuple[dict, dict | None, float | None, str | None] | None = None
     for product in products:
         priced = [(o, *_offer_price(o)) for o in _offers_of(product)]
@@ -315,8 +324,21 @@ def quote_supports_price(page_text: str, quote: str | None, price: float | None)
     return whole in digits
 
 
+def shop_named_as_brand(brand: str | None, name: str | None, page_url: str) -> bool:
+    """Shop platforms fill "brand" with the shop's own name when the owner leaves the
+    vendor field at its default (e.g. brand "La Cabra" for a Fellow kettle on lacabra.com).
+    A brand that is part of the shop's domain but missing from the product name is the shop."""
+    key = normalize_code(brand)
+    if not key or len(key) < 3:
+        return False
+    host = re.sub(r"[^a-z0-9]", "", urlsplit(page_url).hostname or "")
+    return key in host and key not in (normalize_code(name) or "")
+
+
 async def read_product_data(page: Page, *, usage: llm.UsageSink | None = None) -> ProductData:
     data = extract_structured(page.html, page.url) if page.html else ProductData()
+    if shop_named_as_brand(data.brand, data.name, page.url):
+        data.brand = None  # the AI reading below (if any) may still find the real maker
     if data.has_price and data.name:
         return data
     if not get_settings().llm_configured:

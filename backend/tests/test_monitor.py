@@ -129,7 +129,7 @@ async def test_check_records_evidence_and_alerts_on_undercut(monkeypatch, tracke
     user, product, own, rival = tracked_product
     prices = {own.url: 95.0, rival.url: 89.0}
 
-    async def fake_read_price(url, usage):
+    async def fake_read_price(url, usage, market=None):
         return reading(prices[url]), ProductData()
 
     monkeypatch.setattr(monitor, "read_price", fake_read_price)
@@ -152,7 +152,7 @@ async def test_check_records_evidence_and_alerts_on_undercut(monkeypatch, tracke
 async def test_implausible_jump_is_kept_for_review(monkeypatch, tracked_product):
     user, product, _own, rival = tracked_product
 
-    async def fake_read_price(url, usage):
+    async def fake_read_price(url, usage, market=None):
         return reading(9.99), ProductData()  # −90%: probably an accessory or a parsing issue
 
     monkeypatch.setattr(monitor, "read_price", fake_read_price)
@@ -172,7 +172,7 @@ async def test_implausible_jump_is_kept_for_review(monkeypatch, tracked_product)
 async def test_failed_page_backs_off_and_keeps_going(monkeypatch, tracked_product):
     user, product, own, rival = tracked_product
 
-    async def fake_read_price(url, usage):
+    async def fake_read_price(url, usage, market=None):
         if url == rival.url:
             raise FetchError("Couldn't load the page: HTTP 403.")
         return reading(95.0), ProductData()
@@ -212,7 +212,7 @@ async def test_same_page_in_another_workspace_is_read_once(monkeypatch, tracked_
         copy_id, twin_id = copy.id, twin.id
     downloads = []
 
-    async def fake_read_price(url, usage):
+    async def fake_read_price(url, usage, market=None):
         downloads.append(url)
         return reading(97.0), ProductData()
 

@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from backend.extraction import (
@@ -5,6 +7,7 @@ from backend.extraction import (
     normalize_gtin,
     parse_price,
     quote_supports_price,
+    shop_named_as_brand,
 )
 from backend.tests.conftest import fixture_html
 
@@ -90,3 +93,37 @@ def test_llm_quote_must_be_on_the_page():
     assert quote_supports_price(text, "Price: 24,50 €", 24.5)
     assert not quote_supports_price(text, "Price: 19,90 €", 19.9)  # invented quote
     assert not quote_supports_price(text, "Ships within 3 days.", 24.5)  # quote without the price
+
+
+def test_related_product_listed_first_is_not_mistaken_for_this_page():
+    related = {
+        "@type": "Product",
+        "name": "Espresso Grinder",
+        "url": "https://shop.example.com/products/grinder",
+        "offers": {"@type": "Offer", "price": "3399.00", "priceCurrency": "USD"},
+    }
+    this = {
+        "@type": "Product",
+        "name": "Stagg EKG Kettle",
+        "offers": {
+            "@type": "Offer",
+            "price": "165.00",
+            "priceCurrency": "USD",
+            "url": "https://shop.example.com/products/kettle?variant=1",
+        },
+    }
+    html = "".join(
+        f'<script type="application/ld+json">{json.dumps(node)}</script>'
+        for node in (related, this)
+    )
+    data = extract_structured(
+        f"<html><head>{html}</head></html>", "https://shop.example.com/products/kettle"
+    )
+    assert (data.name, data.price) == ("Stagg EKG Kettle", 165.0)
+
+
+def test_shop_name_in_brand_field_is_not_the_maker():
+    assert shop_named_as_brand("La Cabra", "Fellow Stagg EKG", "https://us.lacabra.com/p/ekg")
+    assert not shop_named_as_brand("Fellow", "Fellow Stagg EKG", "https://us.lacabra.com/p/ekg")
+    # a brand's own shop that repeats the brand in the product name is fine
+    assert not shop_named_as_brand("DeLonghi", "DeLonghi Dedica", "https://www.delonghi.com/p")
