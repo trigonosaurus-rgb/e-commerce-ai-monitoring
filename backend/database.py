@@ -10,12 +10,14 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Annotated
 
+from alembic import command
+from alembic.config import Config
 from fastapi import Depends
-from sqlalchemy import Engine, event
-from sqlmodel import Session, SQLModel, create_engine
+from sqlalchemy import Engine, event, inspect
+from sqlmodel import Session, create_engine
 
 from backend import models  # noqa: F401  (registers tables on SQLModel.metadata)
-from backend.config import get_settings
+from backend.config import ROOT_DIR, get_settings
 
 
 @lru_cache
@@ -37,7 +39,17 @@ def get_engine() -> Engine:
 
 
 def init_db() -> None:
-    SQLModel.metadata.create_all(get_engine())
+    """Brings the schema up to date by applying Alembic migrations (creates it on first run)."""
+    engine = get_engine()
+    config = Config(str(ROOT_DIR / "alembic.ini"))
+    tables = set(inspect(engine).get_table_names())
+    with engine.begin() as connection:
+        config.attributes["connection"] = connection
+        if tables and "alembic_version" not in tables:
+            # a database created before migrations existed: it already matches the first one
+            command.stamp(config, "head")
+        else:
+            command.upgrade(config, "head")
 
 
 @contextmanager
