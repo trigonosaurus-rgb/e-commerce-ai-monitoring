@@ -20,8 +20,16 @@ from backend.tests.conftest import make_user, session_scope
 
 
 def reading(price: float, currency: str = "EUR") -> Reading:
-    return Reading(price=price, currency=currency, in_stock=True, method="jsonld", via="direct",
-                   evidence='{"price": "%s"}' % price, title="Headphones", page_url="https://x")
+    return Reading(
+        price=price,
+        currency=currency,
+        in_stock=True,
+        method="jsonld",
+        via="direct",
+        evidence=f'{{"price": "{price}"}}',
+        title="Headphones",
+        page_url="https://x",
+    )
 
 
 # ------------------------------------------------------------------ pure logic
@@ -44,9 +52,18 @@ def test_suspicious_readings_need_review():
 
 
 def change(store="rival.de", old=100.0, new=90.0, own=False, **kw) -> OfferChange:
-    return OfferChange(offer_id=1, store=store, url="https://rival.de/p", is_own=own,
-                       currency="EUR", old_price=old, new_price=new, old_in_stock=True,
-                       new_in_stock=True, **kw)
+    return OfferChange(
+        offer_id=1,
+        store=store,
+        url="https://rival.de/p",
+        is_own=own,
+        currency="EUR",
+        old_price=old,
+        new_price=new,
+        old_in_stock=True,
+        new_in_stock=True,
+        **kw,
+    )
 
 
 def test_significance_threshold_and_own_price():
@@ -60,8 +77,14 @@ def test_alert_kind_detects_undercut():
     before = market_position(95, [100])
     after = market_position(95, [90])
     assert alert_kind([change(new=90.0)], before, after) == "undercut"
-    assert alert_kind([change(old=120, new=110)], market_position(95, [100, 120]),
-                      market_position(95, [100, 110])) == "price_drop"
+    assert (
+        alert_kind(
+            [change(old=120, new=110)],
+            market_position(95, [100, 120]),
+            market_position(95, [100, 110]),
+        )
+        == "price_drop"
+    )
 
 
 # --------------------------------------------------------- check with a fake page
@@ -74,11 +97,26 @@ def tracked_product():
         product = Product(user_id=user.id, name="Sony WH-1000XM6", currency="EUR")
         session.add(product)
         session.flush()
-        own = Offer(product_id=product.id, is_own=True, store="me.de", domain="me.de",
-                    url="https://me.de/p", status="tracking", last_price=95.0, currency="EUR")
-        rival = Offer(product_id=product.id, store="rival.de", domain="rival.de",
-                      url="https://rival.de/p", status="tracking", last_price=100.0,
-                      currency="EUR", next_check_at=utcnow() - timedelta(minutes=1))
+        own = Offer(
+            product_id=product.id,
+            is_own=True,
+            store="me.de",
+            domain="me.de",
+            url="https://me.de/p",
+            status="tracking",
+            last_price=95.0,
+            currency="EUR",
+        )
+        rival = Offer(
+            product_id=product.id,
+            store="rival.de",
+            domain="rival.de",
+            url="https://rival.de/p",
+            status="tracking",
+            last_price=100.0,
+            currency="EUR",
+            next_check_at=utcnow() - timedelta(minutes=1),
+        )
         session.add_all([own, rival])
         session.commit()
         return user, product, own, rival

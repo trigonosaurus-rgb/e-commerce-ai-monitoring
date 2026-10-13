@@ -44,8 +44,9 @@ def fixture_html(name: str) -> str:
 
 def make_user(password: str = "secret-pass") -> User:
     with session_scope() as session:
-        user = User(email=f"user-{uuid.uuid4().hex[:8]}@example.com",
-                    password_hash=hash_password(password))
+        user = User(
+            email=f"user-{uuid.uuid4().hex[:8]}@example.com", password_hash=hash_password(password)
+        )
         session.add(user)
         session.commit()
         return user

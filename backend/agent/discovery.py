@@ -59,6 +59,9 @@ class DiscoveryState(TypedDict, total=False):
     excluded_domains: list[str]
     tried_queries: list[str]
     queries: list[str]
+    retailers: list[str]  # stores the LLM expects to carry the product
+    retailer_query: str | None
+    tried_retailers: list[str]
     seen_urls: list[str]
     candidates: list[dict]
     shortlist: list[dict]
@@ -213,10 +216,12 @@ async def plan_queries(state: DiscoveryState, runtime: Runtime[DiscoveryContext]
             f"different searches (attempt {attempt}/{MAX_ATTEMPTS})",
             level="warning",
         )
+    tried_retailers = state.get("tried_retailers", [])
     plan = await llm.plan_search(
         state["product"],
         store_url=state.get("url") or "",
         previous=state["tried_queries"],
+        previous_retailers=tried_retailers,
         feedback=state["rejections"],
         usage=run,
     )
@@ -225,6 +230,12 @@ async def plan_queries(state: DiscoveryState, runtime: Runtime[DiscoveryContext]
     if gtin and gtin not in state["tried_queries"]:
         queries.append(gtin)
     queries = [q for q in dict.fromkeys(queries) if q not in state["tried_queries"]][:4]
+    retailers = [
+        search.domain_of("https://" + d.strip().removeprefix("https://").removeprefix("http://"))
+        for d in plan.retailer_domains
+    ]
+    skip = set(tried_retailers) | set(state["excluded_domains"])
+    retailers = [d for d in dict.fromkeys(retailers) if d and d not in skip][:10]
     market = state.get("market") or plan.market_country
     with session_scope() as session:
         product = session.get(Product, state["product_id"])
@@ -234,13 +245,18 @@ async def plan_queries(state: DiscoveryState, runtime: Runtime[DiscoveryContext]
     run.log(
         "plan_queries",
         f"Searching {len(queries)} queries"
-        + (f" in the {market.title()} market" if market else ""),
+        + (f" in the {market.title()} market" if market else "")
+        + (f" and {len(retailers)} likely retailers" if retailers else ""),
         queries=queries,
+        retailers=retailers,
         market=market,
     )
     return {
         "queries": queries,
         "tried_queries": state["tried_queries"] + queries,
+        "retailers": retailers,
+        "retailer_query": plan.retailer_query,
+        "tried_retailers": tried_retailers + retailers,
         "market": market,
         "attempt": attempt,
     }
@@ -249,19 +265,26 @@ async def plan_queries(state: DiscoveryState, runtime: Runtime[DiscoveryContext]
 async def search_stores(state: DiscoveryState, runtime: Runtime[DiscoveryContext]) -> dict:
     run = runtime.context.run
     seen, excluded = set(state["seen_urls"]), set(state["excluded_domains"])
+    searches = [(q, {"exclude_domains": sorted(excluded)}) for q in state["queries"]]
+    retailers = [d for d in state.get("retailers", []) if d not in excluded]
+    if retailers and state.get("retailer_query"):
+        # web search restricted to the named stores: finds their product pages directly
+        searches.append(
+            (state["retailer_query"], {"include_domains": retailers, "max_results": 15})
+        )
     results: list[search.SearchResult] = []
-    for query in state["queries"]:
+    for query, options in searches:
         try:
-            results += await search.search_web(
-                query, country=state.get("market"), exclude_domains=sorted(excluded)
-            )
+            results += await search.search_web(query, country=state.get("market"), **options)
         except Exception as exc:
             run.log("search", f"Search for “{query}” failed: {exc}", level="warning")
-    candidates, domains = [], set()
+    candidates, per_domain = [], {}
     for r in results:
-        if r.url in seen or r.domain in excluded or r.domain in domains:
+        # up to 2 pages per store: the first hit is sometimes a category page
+        if r.url in seen or r.domain in excluded or per_domain.get(r.domain, 0) >= 2:
             continue
-        domains.add(r.domain)
+        seen.add(r.url)
+        per_domain[r.domain] = per_domain.get(r.domain, 0) + 1
         candidates.append(
             {
                 "url": r.url,
@@ -273,7 +296,8 @@ async def search_stores(state: DiscoveryState, runtime: Runtime[DiscoveryContext
         )
     run.log(
         "search",
-        f"{len(results)} results → {len(candidates)} new store(s) to screen",
+        f"{len(results)} results → {len(candidates)} new page(s) from {len(per_domain)} "
+        "store(s) to screen",
         results=[{k: c[k] for k in ("title", "url", "domain", "favicon")} for c in candidates],
     )
     return {
@@ -287,9 +311,14 @@ async def screen(state: DiscoveryState, runtime: Runtime[DiscoveryContext]) -> d
     candidates = state["candidates"]
     if not candidates:
         return {"shortlist": []}
-    verdicts = {
-        v.index: v for v in await llm.judge_candidates(state["product"], candidates, usage=run)
-    }
+    judged = await llm.judge_candidates(
+        state["product"],
+        candidates,
+        market=state.get("market"),
+        currency=state.get("currency"),
+        usage=run,
+    )
+    verdicts = {v.index: v for v in judged}
     decisions, accepted, notes = [], [], []
     for i, c in enumerate(candidates):
         v = verdicts.get(i)
@@ -312,7 +341,10 @@ async def screen(state: DiscoveryState, runtime: Runtime[DiscoveryContext]) -> d
         else:
             notes.append(f"{c['domain']}: {reason}")
     room = _room_left(state["product_id"]) - len(state["verified"])
-    shortlist = sorted(accepted, key=lambda c: -c["confidence"])[: max(room, 0) + 2]
+    best_per_store: dict[str, dict] = {}
+    for c in sorted(accepted, key=lambda c: -c["confidence"]):
+        best_per_store.setdefault(c["domain"], c)
+    shortlist = list(best_per_store.values())[: max(room, 0) + 2]
     run.log(
         "screen",
         f"{len(accepted)} of {len(candidates)} look like the same product",
@@ -333,6 +365,11 @@ async def verify(state: DiscoveryState, runtime: Runtime[DiscoveryContext]) -> d
                 reading, data = await read_price(c["url"], run)
             except (FetchError, llm.LLMError) as exc:
                 return c, None, str(exc)
+        currency = state.get("currency")
+        if currency and reading.currency != currency:
+            return c, None, f"Sells in {reading.currency}, outside your market ({currency})."
+        if data.condition in ("used", "refurbished"):
+            return c, None, f"Sells it {data.condition}, not new."
         ours, theirs = normalize_gtin(product.get("gtin")), normalize_gtin(data.gtin)
         if ours and theirs:
             if ours != theirs:
@@ -371,14 +408,9 @@ async def verify(state: DiscoveryState, runtime: Runtime[DiscoveryContext]) -> d
     for c, offer, reason in await asyncio.gather(*(check(c) for c in state["shortlist"])):
         if offer:
             verified.append(offer)
-            note = (
-                ""
-                if offer["currency"] == state.get("currency") or not state.get("currency")
-                else " (different currency — shown, but not compared)"
-            )
             run.log(
                 "verify",
-                f"{c['domain']}: {fmt_money(offer['price'], offer['currency'])} — {reason}{note}",
+                f"{c['domain']}: {fmt_money(offer['price'], offer['currency'])} — {reason}",
                 level="success",
                 url=offer["url"],
                 price=offer["price"],

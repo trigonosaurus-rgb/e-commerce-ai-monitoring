@@ -45,6 +45,7 @@ async def search_web(
     *,
     country: str | None = None,
     exclude_domains: list[str] | None = None,
+    include_domains: list[str] | None = None,
     max_results: int = 8,
 ) -> list[SearchResult]:
     client = _client()
@@ -53,6 +54,7 @@ async def search_web(
         "topic": "general",
         "max_results": max_results,
         "exclude_domains": exclude_domains or None,
+        "include_domains": include_domains or None,
         "include_favicon": True,
     }
     try:

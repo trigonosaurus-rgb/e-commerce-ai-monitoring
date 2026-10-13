@@ -24,6 +24,12 @@ from backend.fetching import Page
 PRODUCT_TYPES = {"product", "productgroup", "productmodel", "individualproduct"}
 IN_STOCK = {"instock", "limitedavailability", "onlineonly", "instoreonly"}
 OUT_OF_STOCK = {"outofstock", "soldout", "discontinued"}
+CONDITIONS = {
+    "newcondition": "new",
+    "usedcondition": "used",
+    "refurbishedcondition": "refurbished",
+    "damagedcondition": "used",
+}
 
 
 @dataclass
@@ -36,6 +42,7 @@ class ProductData:
     price: float | None = None
     currency: str | None = None
     in_stock: bool | None = None
+    condition: str | None = None  # new | used | refurbished
     method: str | None = None  # jsonld | microdata | meta | llm
     evidence: str = ""
     note: str | None = None  # why the price is missing, if it is
@@ -96,6 +103,11 @@ def _availability(value: Any) -> bool | None:
     if key in OUT_OF_STOCK:
         return False
     return None
+
+
+def _condition(value: Any) -> str | None:
+    key = str(value or "").lower().rstrip("/").rsplit("/", 1)[-1]
+    return CONDITIONS.get(key)
 
 
 def _text(value: Any) -> str | None:
@@ -208,6 +220,7 @@ def _from_jsonld(soup: BeautifulSoup, page_url: str) -> ProductData | None:
     if offer is not None:
         data.price, data.currency = price, currency
         data.in_stock = _availability(offer.get("availability"))
+        data.condition = _condition(offer.get("itemCondition") or product.get("itemCondition"))
         data.method = "jsonld"
         shown = {
             k: offer[k]
@@ -315,6 +328,7 @@ async def read_product_data(page: Page, *, usage: llm.UsageSink | None = None) -
     data.brand = data.brand or result.brand
     data.mpn = data.mpn or result.mpn
     data.gtin = data.gtin or result.gtin
+    data.condition = data.condition or result.condition
     if data.has_price:
         return data
     if not result.is_product_page:

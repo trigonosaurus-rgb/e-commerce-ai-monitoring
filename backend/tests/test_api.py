@@ -1,3 +1,5 @@
+import time
+
 from sqlmodel import select
 
 from backend.api import products as products_api
@@ -11,13 +13,29 @@ def add_product(user_id: int) -> tuple[int, int]:
         product = Product(user_id=user_id, name="Desk lamp", currency="EUR")
         session.add(product)
         session.flush()
-        offer = Offer(product_id=product.id, store="rival.de", domain="rival.de",
-                      url="https://rival.de/lamp", status="proposed", last_price=80.0,
-                      currency="EUR", match_confidence=0.9, match_reason="Same EAN.")
+        offer = Offer(
+            product_id=product.id,
+            store="rival.de",
+            domain="rival.de",
+            url="https://rival.de/lamp",
+            status="proposed",
+            last_price=80.0,
+            currency="EUR",
+            match_confidence=0.9,
+            match_reason="Same EAN.",
+        )
         session.add(offer)
         session.flush()
-        session.add(PriceSnapshot(offer_id=offer.id, price=80.0, currency="EUR",
-                                  method="jsonld", fetched_via="direct", evidence='{"price":80}'))
+        session.add(
+            PriceSnapshot(
+                offer_id=offer.id,
+                price=80.0,
+                currency="EUR",
+                method="jsonld",
+                fetched_via="direct",
+                evidence='{"price":80}',
+            )
+        )
         session.commit()
         return product.id, offer.id
 
@@ -40,7 +58,9 @@ def test_login_logout_and_errors(client, user):
     bad = client.post("/api/auth/login", json={"email": user.email, "password": "nope"})
     assert bad.status_code == 401 and bad.json()["detail"]["code"] == "bad_credentials"
 
-    ok = client.post("/api/auth/login", json={"email": user.email.upper(), "password": "secret-pass"})
+    ok = client.post(
+        "/api/auth/login", json={"email": user.email.upper(), "password": "secret-pass"}
+    )
     assert ok.status_code == 200
     assert client.get("/api/auth/me").json() == {"email": user.email, "demo": False}
 
@@ -107,3 +127,28 @@ def test_health_reports_components(client):
     health = client.get("/api/health").json()
     assert health["status"] == "ok" and health["database"] == "ok"
     assert health["ai"] is False and health["scheduler"]["status"] == "stopped"
+
+
+def test_background_runs_start_from_the_api(logged_in, user, monkeypatch):
+    """Runs are started with the real `spawn` (this used to fail in sync endpoints)."""
+    product_id, _ = add_product(user.id)
+
+    async def fake_discovery(run, *, url=None, product_id=None):
+        run.finish(summary="fake discovery")
+
+    async def fake_check(product_id, run, offer_ids=None):
+        return "fake check"
+
+    monkeypatch.setattr(products_api, "run_discovery", fake_discovery)
+    monkeypatch.setattr("backend.scheduler.monitor.check_product", fake_check)
+
+    for path in (f"/api/products/{product_id}/discover", f"/api/products/{product_id}/check"):
+        response = logged_in.post(path)
+        assert response.status_code == 202, response.text
+        run_id = response.json()["run_id"]
+        for _ in range(50):
+            run = logged_in.get(f"/api/runs/{run_id}").json()
+            if run["status"] != "running":
+                break
+            time.sleep(0.02)
+        assert run["status"] == "completed" and run["summary"].startswith("fake")

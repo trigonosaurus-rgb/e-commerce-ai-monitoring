@@ -80,6 +80,9 @@ class ProductExtraction(BaseModel):
     )
     currency: str | None = Field(description="ISO 4217 code, e.g. EUR, USD, GBP.")
     in_stock: bool | None
+    condition: Literal["new", "used", "refurbished"] | None = Field(
+        description="Item condition if the page states it (refurbished/renewed = refurbished)."
+    )
     price_quote: str | None = Field(
         description="A short fragment copied character-for-character from the page text "
         "that contains the price you reported."
@@ -110,6 +113,14 @@ class SearchPlan(BaseModel):
         "online stores. Use brand + model, add the GTIN as its own query if known. "
         "Use the market's language for generic words."
     )
+    retailer_domains: list[str] = Field(
+        description="Up to 10 domains of established online retailers in this market that "
+        "plausibly sell this product (e.g. 'otto.de'). No marketplaces, price-comparison "
+        "sites or the manufacturer's info pages."
+    )
+    retailer_query: str = Field(
+        description="A short query (brand + model) to search for the product on those retailers."
+    )
 
 
 async def plan_search(
@@ -117,6 +128,7 @@ async def plan_search(
     *,
     store_url: str,
     previous: list[str],
+    previous_retailers: list[str],
     feedback: list[str],
     usage: UsageSink | None,
 ) -> SearchPlan:
@@ -124,8 +136,9 @@ async def plan_search(
     if previous:
         retry = (
             "\nThese queries were already tried and found too few matching stores: "
-            f"{json.dumps(previous)}\nWhy candidates were rejected: {json.dumps(feedback[:12])}"
-            "\nSuggest different queries."
+            f"{json.dumps(previous)}\nRetailers already searched: {json.dumps(previous_retailers)}"
+            f"\nWhy candidates were rejected: {json.dumps(feedback[:15])}"
+            "\nSuggest different queries and other retailers."
         )
     return await _ask(
         SearchPlan,
@@ -142,7 +155,12 @@ async def plan_search(
 class CandidateVerdict(BaseModel):
     index: int
     verdict: Literal[
-        "same_product", "different_product", "marketplace_or_aggregator", "not_a_store_page"
+        "same_product",
+        "different_product",
+        "used_or_refurbished",
+        "other_market",
+        "marketplace_or_aggregator",
+        "not_a_store_page",
     ]
     confidence: float = Field(description="0..1")
     reason: str = Field(description="One short sentence a store owner would understand.")
@@ -153,7 +171,12 @@ class CandidateVerdicts(BaseModel):
 
 
 async def judge_candidates(
-    product: dict, candidates: list[dict], *, usage: UsageSink | None
+    product: dict,
+    candidates: list[dict],
+    *,
+    market: str | None,
+    currency: str | None,
+    usage: UsageSink | None,
 ) -> list[CandidateVerdict]:
     listing = "\n".join(
         f"[{i}] {c['title']} | {c['url']}\n    {c['snippet'][:300]}"
@@ -163,12 +186,15 @@ async def judge_candidates(
         CandidateVerdicts,
         smart=False,
         usage=usage,
-        instructions="You screen web search results. Keep only pages where an online store "
-        "sells exactly this product (same model and variant). Reject reviews, articles, "
-        "comparison sites, marketplaces with many sellers, category pages and other models. "
-        + UNTRUSTED,
-        prompt=f"Product: {json.dumps(product)}\n<page>\n{listing}\n</page>\n"
-        "Return one verdict per result index.",
+        instructions="You screen web search results for a store owner looking for direct "
+        "competitors. Keep only pages where an online store sells exactly this product new "
+        "(same model and variant) to customers in the same market. Reject: used, refurbished "
+        "or renewed items; stores clearly serving another country or currency; reviews, "
+        "articles, price-comparison sites, marketplaces with many sellers, category pages "
+        "and other models. " + UNTRUSTED,
+        prompt=f"Product: {json.dumps(product)}\n"
+        f"Our market: {market or 'unknown'}, currency: {currency or 'unknown'}\n"
+        f"<page>\n{listing}\n</page>\nReturn one verdict per result index.",
     )
     return result.verdicts
 
@@ -185,7 +211,8 @@ async def compare_products(ours: dict, theirs: dict, *, usage: UsageSink | None)
         smart=False,
         usage=usage,
         instructions="Decide whether two store listings are the same product (same model and "
-        "variant such as size, color, capacity). Be strict. " + UNTRUSTED,
+        "variant such as size, color, capacity; new vs used/refurbished counts as different). "
+        "Be strict, but don't reject only because a detail is not mentioned. " + UNTRUSTED,
         prompt=f"Our product: {json.dumps(ours)}\n"
         f"<page>\nTheir listing: {json.dumps(theirs)}\n</page>",
     )

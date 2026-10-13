@@ -174,11 +174,18 @@ async def fetch_page(url: str, *, client: httpx.AsyncClient | None = None) -> Pa
 
     if settings.search_configured:
         log.info("Direct fetch of %s failed (%s), trying Tavily Extract", url, reason)
-        try:
-            text = await search.extract_page(url)
-        except Exception as exc:  # the fallback must never hide the original reason
-            log.warning("Tavily Extract failed for %s: %s", url, exc)
-            text = None
-        if text:
-            return Page(url=url, text=text, html=None, via="tavily")
+        if page := await fetch_via_tavily(url):
+            return page
+        reason += "; the backup reader (Tavily) was blocked too"
     raise FetchError(f"Couldn't load the page: {reason}.")
+
+
+async def fetch_via_tavily(url: str) -> Page | None:
+    """Tavily renders the page on its side — also used when a page loaded fine but
+    showed its price only after running JavaScript."""
+    try:
+        text = await search.extract_page(url)
+    except Exception as exc:  # a fallback must never hide the original problem
+        log.warning("Tavily Extract failed for %s: %s", url, exc)
+        return None
+    return Page(url=url, text=text, html=None, via="tavily") if text else None

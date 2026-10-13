@@ -35,8 +35,9 @@ def test_gtin_normalization_ignores_leading_zeros():
 
 
 def test_jsonld_offer():
-    data = extract_structured(fixture_html("jsonld_offer.html"),
-                              "https://www.example-audio.de/sony-wh-1000xm6")
+    data = extract_structured(
+        fixture_html("jsonld_offer.html"), "https://www.example-audio.de/sony-wh-1000xm6"
+    )
     assert data.name.startswith("Sony WH-1000XM6")
     assert data.brand == "Sony"
     assert data.gtin == "4548736160213"
@@ -45,7 +46,9 @@ def test_jsonld_offer():
 
 
 def test_jsonld_graph_with_aggregate_offer():
-    data = extract_structured(fixture_html("jsonld_graph_aggregate.html"), "https://shop.example.com/qc")
+    data = extract_structured(
+        fixture_html("jsonld_graph_aggregate.html"), "https://shop.example.com/qc"
+    )
     assert data.name == "Bose QuietComfort Ultra Headphones"
     assert (data.price, data.currency, data.in_stock) == (1299.0, "SEK", False)
 
@@ -62,7 +65,11 @@ def test_product_group_prefers_variant_from_url():
 def test_microdata():
     data = extract_structured(fixture_html("microdata.html"), "https://grinders.example.com/encore")
     assert (data.name, data.price, data.currency, data.method) == (
-        "Baratza Encore ESP Coffee Grinder", 199.95, "USD", "microdata")
+        "Baratza Encore ESP Coffee Grinder",
+        199.95,
+        "USD",
+        "microdata",
+    )
 
 
 def test_meta_tags():
@@ -72,7 +79,9 @@ def test_meta_tags():
 
 
 def test_page_without_structured_data_has_no_price():
-    data = extract_structured(fixture_html("no_structured_data.html"), "https://clay.example.com/mug")
+    data = extract_structured(
+        fixture_html("no_structured_data.html"), "https://clay.example.com/mug"
+    )
     assert not data.has_price
 
 

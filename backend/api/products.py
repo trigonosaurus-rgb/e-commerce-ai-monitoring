@@ -251,7 +251,7 @@ def delete_product(product_id: int, ws: WorkspaceDep, session: SessionDep):
 
 
 @router.post("/products/{product_id}/discover", response_model=RunStarted, status_code=202)
-def discover_more(product_id: int, ws: WorkspaceDep, session: SessionDep):
+async def discover_more(product_id: int, ws: WorkspaceDep, session: SessionDep):
     ws.require_write()
     product = owned_product(session, ws, product_id)
     run = RunLogger.start(
@@ -265,7 +265,7 @@ def discover_more(product_id: int, ws: WorkspaceDep, session: SessionDep):
 
 
 @router.post("/products/{product_id}/check", response_model=RunStarted, status_code=202)
-def check_now(product_id: int, ws: WorkspaceDep, session: SessionDep):
+async def check_now(product_id: int, ws: WorkspaceDep, session: SessionDep):
     ws.require_write()
     owned_product(session, ws, product_id)
     try:

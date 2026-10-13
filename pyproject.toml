@@ -29,6 +29,7 @@ target-version = "py314"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM", "ASYNC"]
+ignore = ["SIM102"]  # nested ifs are often clearer with a comment between them
 
 [tool.pytest.ini_options]
 testpaths = ["backend/tests"]

@@ -18,7 +18,7 @@ from backend.config import get_settings
 from backend.database import session_scope
 from backend.events import RunLogger
 from backend.extraction import ProductData, read_product_data
-from backend.fetching import FetchError, fetch_page
+from backend.fetching import FetchError, fetch_page, fetch_via_tavily
 from backend.models import Alert, Offer, PriceSnapshot, Product, utcnow
 
 log = logging.getLogger(__name__)
@@ -57,6 +57,14 @@ class Reading:
 async def read_price(url: str, usage: llm.UsageSink | None) -> tuple[Reading, ProductData]:
     page = await fetch_page(url)
     data = await read_product_data(page, usage=usage)
+    if not data.has_price and page.via == "direct" and get_settings().search_configured:
+        # second chance: the price may appear only after JavaScript runs
+        if rendered := await fetch_via_tavily(url):
+            second = await read_product_data(rendered, usage=usage)
+            if second.has_price:
+                for field in ("name", "brand", "mpn", "gtin", "condition"):
+                    setattr(second, field, getattr(second, field) or getattr(data, field))
+                page, data = rendered, second
     if not data.has_price:
         raise NoPriceError(data.note or "No price found on the page.")
     reading = Reading(
