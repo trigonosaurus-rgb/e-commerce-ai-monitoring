@@ -129,7 +129,7 @@ export default function DashboardPage() {
         title="Dashboard"
         description={
           me?.demo
-            ? "A live workspace monitoring real products in German online stores."
+            ? "Live demo: product pages of real German shops play the role of “your store”. Prices and agent runs are real."
             : "Where your prices stand against the market right now."
         }
         actions={<AddProductButton />}
