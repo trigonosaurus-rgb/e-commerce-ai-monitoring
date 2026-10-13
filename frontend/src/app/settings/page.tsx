@@ -32,11 +32,13 @@ interface Health {
 function Notifications({ settings }: { settings: NotificationSettings }) {
   const client = useQueryClient();
   const [email, setEmail] = useState(settings.alert_email ?? "");
+  // the Save button only appears while the address differs from the saved one
+  const emailChanged = email.trim() !== (settings.alert_email ?? "");
   const save = useMutation({
     mutationFn: (patch: Partial<NotificationSettings>) =>
       api.put<NotificationSettings>("/settings/notifications", {
         notify_email: settings.notify_email,
-        alert_email: email || null,
+        alert_email: email.trim() || null,
         notify_telegram: settings.notify_telegram,
         ...patch,
       }),
@@ -119,12 +121,16 @@ function Notifications({ settings }: { settings: NotificationSettings }) {
               className="flex gap-2"
               onSubmit={(event) => {
                 event.preventDefault();
-                save.mutate({}, { onSuccess: () => toast.success("Saved") });
+                if (emailChanged) save.mutate({}, { onSuccess: () => toast.success("Alert email saved") });
               }}
             >
               <Label htmlFor="alert-email" className="sr-only">Alert email</Label>
               <Input id="alert-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-              <Button type="submit" variant="outline" size="sm" className="h-8">Save</Button>
+              {emailChanged && (
+                <Button type="submit" size="sm" className="h-8" disabled={save.isPending}>
+                  Save
+                </Button>
+              )}
             </form>
           ) : (
             <p className="text-xs text-muted-foreground">Email delivery is not set up on this server yet.</p>
