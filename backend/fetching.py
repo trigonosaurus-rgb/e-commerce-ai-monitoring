@@ -39,6 +39,15 @@ _BLOCK_MARKERS = re.compile(
     re.IGNORECASE,
 )
 MAX_REDIRECTS = 5
+# clearly a file, not a product page: no point trying another route
+FILE_TYPES = (
+    "application/pdf",
+    "image/",
+    "video/",
+    "audio/",
+    "application/zip",
+    "application/octet-stream",
+)
 
 
 class FetchError(Exception):
@@ -127,10 +136,12 @@ async def _fetch_direct(url: str, client: httpx.AsyncClient) -> tuple[int, Page]
                     raise FetchError("The site sent a broken redirect.")
                 current = urljoin(current, location)
                 continue
-            content_type = response.headers.get("content-type", "").lower()
-            if content_type and "html" not in content_type:
-                kind = content_type.split(";")[0]
+            kind = response.headers.get("content-type", "").lower().split(";")[0].strip()
+            if kind.startswith(FILE_TYPES):
                 raise PermanentFetchError(f"The link is not a web page ({kind}).")
+            if kind and "html" not in kind:
+                # e.g. text/plain "Access denied" from bot protection: worth another route
+                raise FetchError(f"the site answered with {kind} instead of a page")
             body = bytearray()
             async for chunk in response.aiter_bytes():
                 body += chunk

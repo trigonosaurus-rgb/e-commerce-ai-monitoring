@@ -98,3 +98,13 @@ async def test_non_html_is_rejected():
     async with _client(handler) as client:
         with pytest.raises(PermanentFetchError, match="not a web page"):
             await fetch_page(f"{PUBLIC}/manual.pdf", client=client)
+
+
+async def test_plain_text_answer_is_treated_as_a_block_not_a_dead_link():
+    def handler(request):
+        return httpx.Response(200, text="Access Denied", headers={"content-type": "text/plain"})
+
+    async with _client(handler) as client:
+        with pytest.raises(FetchError, match="text/plain instead of a page") as info:
+            await fetch_page(f"{PUBLIC}/product", client=client)
+    assert not isinstance(info.value, PermanentFetchError)
